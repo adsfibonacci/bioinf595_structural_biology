@@ -1,0 +1,13 @@
+#+title: Bioinformatics 595 Structural Biology Course
+#+author: Alexander Speigle
+#+options: toc:2 num:nil
+#+startup: overview
+
+* Overview
+This is a host for the structural biology and protein design class for BIOINF595 at the University of Michigan. Each subfolder is a new lab with a different task related to machine learning and computational biology.
+For my own use, I always start with a new virtual environment in each subfolder. 
+#+begin_src bash
+  git clone git@github.com:adsfibonacci/bioinf595_structural_biology.git
+  cd bioinf595_structural_biology  
+#+end_src
+I tend to prefer \texttt{pyenv-virtualenv}
