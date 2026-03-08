@@ -10,4 +10,5 @@ For my own use, I always start with a new virtual environment in each subfolder.
   git clone git@github.com:adsfibonacci/bioinf595_structural_biology.git
   cd bioinf595_structural_biology  
 #+end_src
-I tend to prefer \texttt{pyenv-virtualenv}
+I tend to prefer ~pyenv~ with ~pyenv-virtualenv~. Each virtual environment uses \texttt{pyright} to give me code autocompletion.
+
