@@ -1,0 +1,6 @@
+panel>=1.3
+holoviews>=1.18
+datashader>=0.16
+bokeh>=3.3
+pandas
+numpy
