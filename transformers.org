@@ -1,0 +1,44 @@
+#+setupfile: ~/.emacs.d/latex.org
+#+property: header-args:Python :session *Python* :results output :python ~/.pyenv/versions/structural_biology_lab4/bin/python
+
+#+begin_src python
+  import sys
+  print(sys.version)
+  print(sys._base_executable)
+  from huggingface_hub import login
+  login(token=os.environ["HF_TOKEN"])
+  print("Completed Login")
+#+end_src
+
+#+RESULTS:
+: 3.12.7 (main, Jan 18 2026, 05:20:56) [GCC 15.2.1 20260103]
+: /home/alex/.pyenv/versions/3.12.7/bin/python3.12
+: Completed Login
+
+#+begin_src python
+  import datamol as dm
+  from molfeat.trans.pretrained.hf_transformers import PretrainedHFTransformer
+  smiles = dm.freesolv().iloc[:100].smiles
+  transformer = PretrainedHFTransformer(kind='ChemGPT-19M', notation='selfies', dtype=float)
+  features = transformer(smiles)
+  print("Completed featurization") 
+#+end_src
+
+#+RESULTS:
+#+begin_example
+_request non-retriable exception: Anonymous caller does not have storage.objects.list access to the Google Cloud Storage bucket. Permission 'storage.objects.list' denied on resource (or it may not exist)., 401
+Traceback (most recent call last):
+  File "/home/alex/.pyenv/versions/structural_biology_lab4/lib/python3.12/site-packages/gcsfs/retry.py", line 135, in retry_request
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/alex/.pyenv/versions/structural_biology_lab4/lib/python3.12/site-packages/gcsfs/core.py", line 485, in _request
+    validate_response(status, contents, path, args)
+  File "/home/alex/.pyenv/versions/structural_biology_lab4/lib/python3.12/site-packages/gcsfs/retry.py", line 122, in validate_response
+    raise HttpError(error)
+gcsfs.retry.HttpError: Anonymous caller does not have storage.objects.list access to the Google Cloud Storage bucket. Permission 'storage.objects.list' denied on resource (or it may not exist)., 401
+#+end_example
+
+#+begin_src python
+from transformers import pipeline
+
+#+end_src

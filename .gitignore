@@ -1,0 +1,25 @@
+# LaTeX / Org export
+*.pdf
+*.tex
+
+# minted cache
+_minted/
+
+# python
+__pycache__/
+*.pyc
+
+# simulation outputs
+intermediate/
+intermediates/
+products/
+product/
+results/
+
+# structural biology data
+*.pdb
+
+# archives
+*.tar
+*.gz
+*.zip

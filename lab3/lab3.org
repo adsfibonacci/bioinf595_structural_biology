@@ -1,0 +1,451 @@
+#+setupfile: ~/.emacs.d/latex.org
+#+title: Bioinf 595 Lab 3
+#+author: Alexander Speigle
+#+property: header-args:R :session *R* :tangle ./src/lab3.r :results output :exports both
+#+property: header-args:Python :session *Python* :tangle ./src/lab3.py :results output :exports both :python ~/.pyenv/versions/structural_biology_lab3/bin/python
+
+All code here has been tangled to the \texttt{lab3.r} and \texttt{lab3.py} files in the \texttt{src} directory.
+* Section 1a
+This study is profiling fluorescent chemical compounds such as Texas Red in a high throughput screening study.
+It was trying to reduce false positives when screening active compounds.
+
+There are 58,464 total screens, 34 active, 47,622 inactive, and 10,808 inconclusive.
+
+#+begin_export latex
+An active compound, 1,2-Benzo-8-(D-alanyl)-3-phenoxazone nitrate, has
+an InChiKey of \\ \texttt{BNIGYSSWARYXFF-BTQNPOSSSA-N} and a CID of \texttt{461805}. 
+#+end_export
+
+\newpage
+* Section 2
+#+name: includes
+#+begin_src R :results none :exports none
+  required_packages <- c(
+    "tidyverse",
+    "httr2",
+    "arrow",
+    "purrr",
+    "dplyr"
+  )
+
+  # Install missing packages only
+  installed <- rownames(installed.packages())
+
+  for (pkg in required_packages) {
+    if (!(pkg %in% installed)) {
+      install.packages(pkg, dependencies = TRUE)
+    }
+  }
+
+  # Load libraries
+  lapply(required_packages, library, character.only = TRUE)
+
+  setwd("/home/alex/Documents/structural_biology/lab3/")
+#+end_src
+
+#+name: aid-function
+#+begin_src R :exports none :results none
+
+# These utils help retrieving the compounds for an assay using the
+# the (complex) PubChem pug api.
+#
+# To use:
+#
+#   # an AID is the PubChem identifier for the assay
+#   aid <- 587
+#
+#   cids <- get_aid_compounds(aid)
+#   cids |> dplyr::glimpse()
+#
+#    Rows: 58,464
+#    Columns: 4
+#    $ CID      <int> 51, 108, 119, 138, 178, 199, 248, 249, 286, 289, 305, 339, 500, 525, 535, 546, 547, 564…
+#    $ SMILES   <chr> "C(CC(=O)O)C(=O)C(=O)O", "C1=CC(=CN=C1)CC(=O)O", "C(CC(=O)O)CN", "C(CCN)CC(=O)O", "CC(=…
+#    $ InChI    <chr> "InChI=1S/C5H6O5/c6-3(5(9)10)1-2-4(7)8/h1-2H2,(H,7,8)(H,9,10)", "InChI=1S/C7H7NO2/c9-7(…
+#    $ InChIKey <chr> "KPGXRSRHYNQIFN-UHFFFAOYSA-N", "WGNUNYPERJMVRM-UHFFFAOYSA-N", "BTCSSZJGUNDROE-UHFFFAOYS…
+
+
+####################
+# HELPER FUNCTIONS #
+####################
+
+#' The logic for building up this url:
+#' https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest#section=URL-based-API
+#'
+#'  <input specification> = <domain>/<namespace>/<identifiers>
+#'  <domain> = ... assay ...
+#'  assay domain <namespace> = aid ...
+#'  <identifiers> = comma-separated list of positive integers (e.g. cid, sid, aid)
+#'  <operation specifications> = ... cids ...
+#'  <output specification> = ... JSON ...
+#'
+#' SIDS / CIDS / AIDS
+#' option:
+#'   list_return
+#'     allowed values: grouped, flat, listkey
+#'     Type of identifier list to return
+#'   cids_type
+#'     allowed values: all, active, inactive
+#'
+#' Request Headers
+#'  JSON: Accept = 'application/json'
+#'
+aid_to_id_list <- function(
+    aid,
+    cids_type,
+    verbose = FALSE) {
+
+    req <- request("https://pubchem.ncbi.nlm.nih.gov/rest/pug") |>
+        httr2::req_url_path_append("assay", "aid", aid, "cids", "JSON") |>
+        httr2::req_url_query(
+            cids_type = cids_type,
+            list_return = "listkey") |>
+        httr2::req_headers(Accept = "application/json")
+
+    if (verbose) {
+        req |> capture.output() |> cat("\n")
+    }
+    req <- req |> httr2::req_perform()
+
+    res <- httr2::resp_body_json(req)
+    list(
+        listkey = res$IdentifierList$ListKey,
+        size = res$IdentifierList$Size)
+}
+
+
+#' The logic for building up this url:
+#' https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest#section=URL-based-API
+#'
+#'  <input specification> = <domain>/<namespace>/<identifiers>
+#'  <domain> = ... compound ...
+#'  compound domain <namespace> = ... listkey ...
+#'  <identifiers> = comma separated list of positive ingegers (e.g. the returned listkey)
+#'  compound domain <operation specification> = cids
+#'  <output specification> = ... CSV ...
+#'
+#' Request Headers
+#'  CSV: Accept = 'text/csv'
+#'
+id_list_to_cids <- function(
+    id_list,
+    verbose = FALSE) {
+
+    req <- request("https://pubchem.ncbi.nlm.nih.gov/rest/pug") |>
+        httr2::req_url_path_append("compound", "listkey", id_list$listkey, "cids", "JSON") |>
+        httr2::req_headers(Accept = "application/json") |>
+        httr2::req_retry(
+            max_tries = 5,
+            backoff = ~ 2 ^ .x,
+            is_transient = function(resp) httr2::resp_status(resp) >= 500)
+    
+    if (verbose) {
+        req |> capture.output() |> cat("\n")
+    }
+    req <- req |> httr2::req_perform()
+    
+    res <- req |> httr2::resp_body_json()
+    data.frame(cid = res$IdentifierList$CID |> unlist())
+}
+
+
+
+#' The logic for building up this url:
+#' https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest#section=URL-based-API
+#'
+#'  <input specification> = <domain>/<namespace>/<identifiers>
+#'  <domain> = ... compound ...
+#'  compound domain <namespace> = ... listkey ...
+#'  <identifiers> = comma separated list of positive ingegers (e.g. the returned listkey)
+#'  compound domain <operation specification> = <compound property>
+#'  <compound property> = property / [comma-separated list of property tags]
+#'  <output specification> = ... CSV ...
+#'
+#' Compound Property Tables
+#'   SMILES
+#'   InChI
+#'   InChIKey
+#'
+id_list_to_properties <- function(
+    id_list,
+    properties,
+    listkey_start,
+    listkey_count,
+    verbose = FALSE) {
+
+    properties_string <- paste(properties, collapse = ",")
+    
+    req <- request("https://pubchem.ncbi.nlm.nih.gov/rest/pug") |>
+        httr2::req_url_path_append(
+            "compound", "listkey", id_list$listkey,
+            "property", properties_string, "JSON") |>
+        httr2::req_url_query(
+            listkey_start = listkey_start,
+            listkey_count = listkey_count) |>
+        httr2::req_headers(Accept = "application/json") |>
+        httr2::req_retry(
+            max_tries = 5,
+            backoff = ~ 2 ^ .x,
+            is_transient = function(resp) httr2::resp_status(resp) >= 500)
+
+    if (verbose) {
+        req |> capture.output() |> cat("\n")
+    }
+    req <- req |> httr2::req_perform()
+
+    res <- req |> httr2::resp_body_json()
+
+    res$PropertyTable$Properties |>
+        dplyr::bind_rows()
+
+}
+
+get_aid_compounds <- function(
+  aid,
+  cids_type = "all",
+  properties = c("SMILES", "InChi", "InChiKey"),
+  pagination_size = 10000,
+  throttle = 0.2,
+  verbose = FALSE) {
+
+    id_list <- aid_to_id_list(
+        aid = aid,
+        cids_type = cids_type,
+        verbose = verbose)
+
+    tibble::tibble(
+        listkey_start = seq(0, id_list$size - 1, by = pagination_size),
+        listkey_count = pmin(pagination_size, id_list$size - listkey_start)) |>
+        dplyr::rowwise() |>
+        dplyr::do({
+            pagination <- .
+            id_list_to_properties(
+                id_list = id_list,
+                properties,
+                listkey_start = pagination$listkey_start,
+                listkey_count = pagination$listkey_count,
+                verbose = verbose)
+        }) |>
+        dplyr::ungroup()
+}
+#+end_src
+
+#+name: pubchem-ping
+#+begin_src R
+  aids <- c(587, 588, 590, 591, 592, 593, 594)
+
+  all_compounds <- aids %>%
+    purrr::map_dfr(function(aid) {
+      message("Processing AID: ", aid)
+      
+      tryCatch({
+        get_aid_compounds(
+          aid = aid,
+          cids_type = "active",
+          properties = c("SMILES", "InChI", "InChIKey")
+        ) %>%
+          mutate(AID = aid)  # Add the assay ID column
+        
+      }, error = function(e) {
+        message("Skipping AID ", aid, " (", e$message, ")")
+        return(NULL)
+      })
+    })
+
+  all_compounds <- all_compounds %>%
+    select(AID, CID, SMILES, InChI, InChIKey)
+
+  multi_active_counts <- all_compounds %>%
+    distinct(AID, CID) %>%       # Remove duplicates per assay
+    count(CID, name = "n_active_assays") %>%
+    filter(n_active_assays > 1)  # Keep only compounds in multiple assays
+
+  readr::write_tsv(all_compounds, "intermediate/active_compounds.tsv", progress=FALSE)
+  readr::write_tsv(multi_active_counts, "intermediate/multi_active_compounds.tsv", progress=FALSE)
+
+  message("Total compounds fetched: ", nrow(all_compounds))
+  message("Compounds active in multiple assays: ", nrow(multi_active_counts))
+#+end_src
+
+#+RESULTS: pubchem-ping
+#+begin_example
+Processing AID: 587
+Processing AID: 588
+Processing AID: 590
+Processing AID: 591
+Processing AID: 592
+Skipping AID 592 (HTTP 404 Not Found.)
+Processing AID: 593
+Processing AID: 594
+Total compounds fetched: 7109
+Compounds active in multiple assays: 283
+#+end_example
+
+Note that AID 592 returns 404 because it does not have an \texttt{active} compounds category. All assays were either inactive or inconclusive. 
+\newpage
+* Section 3
+#+name: imports
+#+begin_src python :exports code
+  import sys
+  import subprocess
+  print(sys.executable)
+  packages = ["numpy", "pandas", "rdkit", "datasets", "huggingface_hub", "pyright"]
+  subprocess.check_call([sys.executable, "-m", "pip", "install", *packages])
+
+  import numpy as np
+  import pandas as pd
+  from rdkit import Chem
+  from rdkit.Chem.MolStandardize import rdMolStandardize
+
+  import datasets
+  from datasets import Dataset, logging
+  from huggingface_hub import login, HfApi
+  logging.set_verbosity_error()
+#+end_src
+
+#+RESULTS: imports
+#+begin_example
+/home/alex/.pyenv/versions/structural_biology_lab3/bin/python
+Requirement already satisfied: numpy in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (2.4.2)
+Requirement already satisfied: pandas in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (3.0.0)
+Requirement already satisfied: rdkit in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (2025.9.4)
+Requirement already satisfied: datasets in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (4.5.0)
+Requirement already satisfied: huggingface_hub in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (1.3.7)
+Requirement already satisfied: pyright in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (1.1.408)
+Requirement already satisfied: python-dateutil>=2.8.2 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from pandas) (2.9.0.post0)
+Requirement already satisfied: Pillow in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from rdkit) (12.1.0)
+Requirement already satisfied: filelock in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (3.20.3)
+Requirement already satisfied: pyarrow>=21.0.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (23.0.0)
+Requirement already satisfied: dill<0.4.1,>=0.3.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (0.4.0)
+Requirement already satisfied: requests>=2.32.2 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (2.32.5)
+Requirement already satisfied: httpx<1.0.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (0.28.1)
+Requirement already satisfied: tqdm>=4.66.3 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (4.67.3)
+Requirement already satisfied: xxhash in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (3.6.0)
+Requirement already satisfied: multiprocess<0.70.19 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (0.70.18)
+Requirement already satisfied: fsspec<=2025.10.0,>=2023.1.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (2025.10.0)
+Requirement already satisfied: packaging in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (26.0)
+Requirement already satisfied: pyyaml>=5.1 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from datasets) (6.0.3)
+Requirement already satisfied: hf-xet<2.0.0,>=1.2.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from huggingface_hub) (1.2.0)
+Requirement already satisfied: shellingham in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from huggingface_hub) (1.5.4)
+Requirement already satisfied: typer-slim in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from huggingface_hub) (0.21.1)
+Requirement already satisfied: typing-extensions>=4.1.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from huggingface_hub) (4.15.0)
+Requirement already satisfied: aiohttp!=4.0.0a0,!=4.0.0a1 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (3.13.3)
+Requirement already satisfied: anyio in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from httpx<1.0.0->datasets) (4.12.1)
+Requirement already satisfied: certifi in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from httpx<1.0.0->datasets) (2026.1.4)
+Requirement already satisfied: httpcore==1.* in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from httpx<1.0.0->datasets) (1.0.9)
+Requirement already satisfied: idna in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from httpx<1.0.0->datasets) (3.11)
+Requirement already satisfied: h11>=0.16 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from httpcore==1.*->httpx<1.0.0->datasets) (0.16.0)
+Requirement already satisfied: nodeenv>=1.6.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from pyright) (1.10.0)
+Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (2.6.1)
+Requirement already satisfied: aiosignal>=1.4.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (1.4.0)
+Requirement already satisfied: attrs>=17.3.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (25.4.0)
+Requirement already satisfied: frozenlist>=1.1.1 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (1.8.0)
+Requirement already satisfied: multidict<7.0,>=4.5 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (6.7.1)
+Requirement already satisfied: propcache>=0.2.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (0.4.1)
+Requirement already satisfied: yarl<2.0,>=1.17.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2025.10.0,>=2023.1.0->datasets) (1.22.0)
+Requirement already satisfied: six>=1.5 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas) (1.17.0)
+Requirement already satisfied: charset_normalizer<4,>=2 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from requests>=2.32.2->datasets) (3.4.4)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from requests>=2.32.2->datasets) (2.6.3)
+Requirement already satisfied: click>=8.0.0 in /home/alex/.pyenv/versions/structural_biology_lab3/lib/python3.12/site-packages (from typer-slim->huggingface_hub) (8.3.1)
+
+[notice] A new release of pip is available: 26.0 -> 26.0.1
+[notice] To update, run: /home/alex/.pyenv/versions/structural_biology_lab3/bin/python -m pip install --upgrade pip
+#+end_example
+
+#+name: sanitize-smiles
+#+begin_src python
+  df = pd.read_csv("intermediate/active_compounds.tsv", sep="\t")
+  normalizer = rdMolStandardize.Normalizer()
+  reionizer = rdMolStandardize.Reionizer()
+  fragment_remover = rdMolStandardize.FragmentRemover()
+
+  def sanitize_smiles(smiles):
+    try:
+      mol = Chem.MolFromSmiles(smiles)
+      if mol is None:
+        return None
+      mol = normalizer.normalize(mol)
+      mol = reionizer.reionize(mol)
+      mol = fragment_remover.remove(mol)
+      return Chem.MolToSmiles(mol, canonical=True)
+    except Exception as e:
+      print(f"Error sanitizing SMILES {smiles}: {e}")
+      return None
+    return
+  df['SMILES_sanitized'] = df['SMILES'].apply(sanitize_smiles)
+
+  changed_count = (df['SMILES'] != df['SMILES_sanitized']).sum()
+  total_count = len(df)
+
+  df = df.dropna(subset=['SMILES_sanitized'])
+
+  print(f"Total molecules: {total_count}")
+  print(f"SMILES changed after sanitization: {changed_count}")
+  print(f"Percentage changed: {changed_count/total_count*100:.2f}%")
+  df.to_csv("intermediate/active_compounds_sanitized.tsv", sep="\t", index=False)
+  df.to_csv("product/Simeonov2008_compounds_sanitized_2026128.tsv", sep="\t", index=False)
+  print("Sanitized SMILES saved to 'active_compounds_sanitized.tsv'")
+#+end_src
+
+#+RESULTS: sanitize-smiles
+: Total molecules: 7109
+: SMILES changed after sanitization: 7104
+: Percentage changed: 99.93%
+: Sanitized SMILES saved to 'active_compounds_sanitized.tsv'
+
+\newpage
+* Section 4
+There is a login access key that is not included in the file due to security purposes. 
+#+name: huggingface-login
+#+begin_src python :exports none :tangle no
+  HF_TOKEN = os.getenv("HF_TOKEN")
+  login(token=os.environ["HF_TOKEN"])
+#+end_src
+
+#+RESULTS: huggingface-login
+
+#+name: huggingface-dataset
+#+begin_src python :exports code
+  huggingface_repo = "adsfibonacci/Simeonov2008"
+  dataset = datasets.load_dataset(
+      "csv",
+      data_files="product/Simeonov2008_compounds_sanitized_2026128.tsv",
+      sep="\t",
+      keep_in_memory=True
+  )
+  dataset.push_to_hub(
+      repo_id = huggingface_repo)
+  
+  hf_dataset = datasets.load_dataset(huggingface_repo)
+  df = hf_dataset['train'].to_pandas()
+  print("Completed dataset creation")
+#+end_src
+
+#+RESULTS: huggingface-dataset
+#+begin_example
+Uploading the dataset shards:   0%|                                         | 0/1 [00:00<?, ? shards/s]
+Creating parquet from Arrow format:   0%|                                        | 0/1 [00:00<?, ?ba/s]Creating parquet from Arrow format: 100%|███████████████████████████████| 1/1 [00:00<00:00, 115.96ba/s]
+Processing Files (0 / 0)      : |                                         |  0.00B /  0.00B            
+New Data Upload               : |                                         |  0.00B /  0.00B            
+
+                              : 100%|█████████████████████████████████████|  978kB /  978kB            
+
+                              : 100%|█████████████████████████████████████|  978kB /  978kB            Processing Files (1 / 1)      : 100%|█████████████████████████████████████|  978kB /  978kB,   ???B/s  
+
+                              : 100%|█████████████████████████████████████|  978kB /  978kB            Processing Files (1 / 1)      : 100%|█████████████████████████████████████|  978kB /  978kB,  0.00B/s  
+New Data Upload               : |                                         |  0.00B /  0.00B,  0.00B/s  
+                              : 100%|█████████████████████████████████████|  978kB /  978kB            
+Uploading the dataset shards: 100%|█████████████████████████████████| 1/1 [00:00<00:00,  2.80 shards/s]Uploading the dataset shards: 100%|█████████████████████████████████| 1/1 [00:00<00:00,  2.80 shards/s]
+No files have been modified since last commit. Skipping to prevent empty commit.
+Completed dataset creation
+#+end_example
+
+| AID |    CID | InChIKey                    | SMILES sanitized        |
+|-----+--------+-----------------------------+-------------------------|
+| 587 |   4971 | ZCFFYALKHPIRKJ-UHFFFAOYSA-N | C=Cc1c(C)c2cc3[nH]c...  |
+| 587 |  13399 | YDTDKKULPWTHRV-UHFFFAOYSA-N | Nc1n[nH]c2ccccc12       |
+| 587 |  62770 | GUGHGUXZJWAIAS-QQYBVWGSSA-N | COc1cccc2c1C(=O)c1c...  |
+| 587 |  72685 | QFIIYGZAUXVPSZ-UHFFFAOYSA-N | CC1=c2c(oc3cc(O)c(...   |
+| 587 | 278672 | PSWVJVFHPGZDQH-UHFFFAOYSA-N | O=C1c2ccccc2C(=O)c2c... |
+
+The link to the full repo is [[https://huggingface.co/datasets/adsfibonacci/Simeonov2008][here]] (https://huggingface.co/datasets/adsfibonacci/Simeonov2008). 

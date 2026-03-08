@@ -1,0 +1,226 @@
+#+setupfile: ~/.emacs.d/latex.org
+#+title: Lab 1
+#+property: header-args R :results output :session *R* :exports both :cache no
+
+* Part 1
+#+name: setup
+#+begin_src R :results none
+  user_lib <- Sys.getenv("R_LIBS_USER")
+  if (!dir.exists(user_lib)) dir.create(user_lib, recursive = TRUE)
+
+  .libPaths(c(user_lib, .libPaths()))
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
+  if(!requireNamespace("tidyverse")) {
+    install.packages("tidyverse")
+  }
+  if(!requireNamespace("dplyr")) {
+    install.packages("dplyr")
+  }
+  if(!requireNamespace("ggplot2")) {
+    install.packages("ggplot2")
+  }
+  if(!requireNamespace("stringr")) {
+    library(stringr)
+  }
+  library(tidyverse)
+  library(dplyr)
+  library(ggplot2)
+  library(stringr)
+  
+  setwd("/home/alex/Documents/structural_biology/lab1/")
+#+end_src
+
+* Part 2
+#+name: 
+#+begin_src R
+  library(tidyverse)
+  library(stringr)
+  library(readr)
+
+  # 1. Load plate-reader data
+  dr_plate <- read_tsv(
+    "data/dr_plate.txt",
+    skip = 34,
+    n_max = 58,
+    show_col_types = FALSE
+  ) %>%
+    rename(
+      time_point = 1,
+      temperature = 2
+    ) %>%
+    pivot_longer(
+      cols = -c(time_point, temperature),
+      names_to = "well_id",
+      values_to = "growth"
+    )
+
+  # 2-fold dilution series
+  dose_series <- c(
+    100, 50, 25, 12.5, 6.25, 3.125,
+    1.5625, 0.78125, 0.390625,
+    0.1953125, 0.09765625, 0.048828125
+  )
+
+  dr_plate <- dr_plate %>%
+    mutate(
+      row = str_extract(well_id, "^[A-H]"),
+      column = str_extract(well_id, "\\d+$") |> as.integer(),
+      row = match(row, LETTERS)
+    ) %>%
+    mutate(
+      treatment = case_when(
+        row %in% c(1, 8) ~ "DMSO",
+        row %in% 2:4 ~ "BAY 11-7082",
+        row %in% 5:7 ~ "BAY 11-7085"
+      ),
+      dose_uM = dose_series[column],
+      log10_dose = log10(dose_uM * 1e-6),
+      dose_label = factor(
+        sprintf("%.2g uM", dose_uM),
+        levels = sprintf("%.2g uM", dose_series)
+      )
+    )
+
+  # Replica indexing
+  replicas <- dr_plate %>%
+    distinct(row, treatment) %>%
+    group_by(treatment) %>%
+    mutate(replica = factor(row_number()))
+
+  dr_plate <- dr_plate %>%
+    left_join(replicas, by = c("row", "treatment")) %>%
+    select(
+      time_point, row, column, treatment,
+      log10_dose, dose_label,
+      temperature, growth, replica
+    )
+
+  glimpse(dr_plate)
+
+  # Save
+  dir.create("intermediate", showWarnings = FALSE, recursive = TRUE)
+  save(dr_plate, file = "intermediate/dr_plate.Rdata")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+[1mindexing[0m [34mdr_plate.txt[0m [=============================================================] [32m4.35GB/s[0m, eta: [36m 0s[0m                                                                                                                                           > > > + . + > > . + . + > > > . + > > . + > > Rows: 5,568
+Columns: 9
+$ time_point  [3m[90m<time>[39m[23m 00:00:00[90m, [39m00:00:00[90m, [39m00:00:00[90m, [39m00:00:00[90m, [39m00:00:00[90m, [39m00:00:00[90m, [39m00:00:00[90m, [39m00:00:00[90m, [39m0…
+$ row         [3m[90m<int>[39m[23m 1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m3[90m, [39m3[90m, [39m3[90m, [39m3…
+$ column      [3m[90m<int>[39m[23m 1[90m, [39m2[90m, [39m3[90m, [39m4[90m, [39m5[90m, [39m6[90m, [39m7[90m, [39m8[90m, [39m9[90m, [39m10[90m, [39m11[90m, [39m12[90m, [39m1[90m, [39m2[90m, [39m3[90m, [39m4[90m, [39m5[90m, [39m6[90m, [39m7[90m, [39m8[90m, [39m9[90m, [39m10[90m, [39m11[90m, [39m12[90m, [39m1[90m, [39m2…
+$ treatment   [3m[90m<chr>[39m[23m "DMSO"[90m, [39m"DMSO"[90m, [39m"DMSO"[90m, [39m"DMSO"[90m, [39m"DMSO"[90m, [39m"DMSO"[90m, [39m"DMSO"[90m, [39m"DMSO"[90m, [39m"DMSO"[90m, [39m"DMSO"[90m, [39m"D…
+$ log10_dose  [3m[90m<dbl>[39m[23m -4.00000[90m, [39m-4.30103[90m, [39m-4.60206[90m, [39m-4.90309[90m, [39m-5.20412[90m, [39m-5.50515[90m, [39m-5.80618[90m, [39m-6.10721[90m, [39m-6…
+$ dose_label  [3m[90m<fct>[39m[23m 1e+02 uM[90m, [39m50 uM[90m, [39m25 uM[90m, [39m12 uM[90m, [39m6.2 uM[90m, [39m3.1 uM[90m, [39m1.6 uM[90m, [39m0.78 uM[90m, [39m0.39 uM[90m, [39m0.2 uM[90m, [39m0…
+$ temperature [3m[90m<dbl>[39m[23m 25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4[90m, [39m25.4…
+$ growth      [3m[90m<dbl>[39m[23m 0.138[90m, [39m0.126[90m, [39m0.130[90m, [39m0.122[90m, [39m0.121[90m, [39m0.117[90m, [39m0.120[90m, [39m0.140[90m, [39m0.140[90m, [39m0.143[90m, [39m0.125[90m, [39m0.120…
+$ replica     [3m[90m<fct>[39m[23m 1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m1[90m, [39m2[90m, [39m2[90m, [39m2[90m, [39m2…
+#+end_example
+
+* Part 3
+** Plots 1
+#+begin_src R
+  # 1. Convert time_point to hours manually (HH:MM:SS -> hours)
+  dr_plate <- dr_plate %>%
+    mutate(
+      time_hour = as.numeric(substr(time_point, 1, 2)) +
+                  as.numeric(substr(time_point, 4, 5))/60 +
+                  as.numeric(substr(time_point, 7, 8))/3600,
+      growth_pct = growth * 100
+    )
+
+  # 2. Generate facet grid plot
+  p <- ggplot(dr_plate, aes(x = time_hour, y = growth_pct, color = replica, group = replica)) +
+    geom_line() +
+    facet_grid(rows = vars(treatment), cols = vars(dose_label)) +
+    scale_x_continuous(breaks = c(0, 6, 12, 18, 24), limits = c(0, 24)) +
+    scale_y_continuous(breaks = c(0, 50, 100), limits = c(0, 100)) +
+    scale_color_discrete(name = "Replica") +
+    labs(
+      x = "Time Point (h)",
+      y = "OD of Control (%)",
+      title = "Drug Inhibition of Growth Kinetics"
+    ) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+      strip.text = element_text(size = 10)
+    )
+
+  # 3. Save PDF
+  # Make sure the intermediate directory exists
+  if (!dir.exists("product")) {
+    dir.create("product", recursive = TRUE)
+  }
+  today <- format(Sys.Date(), "%Y%m%d")
+  pdf_file <- paste0("product/dr_plate_", today, ".pdf")
+  ggsave(pdf_file, plot = p, width = 14, height = 8)
+#+end_src
+
+#+RESULTS:
+: Warning message:
+: [1m[22mRemoved 1810 rows containing missing values or
+: values outside the scale range (`geom_line()`).
+
+** Plots 2
+#+begin_src R
+    dr_plate_end <- dr_plate %>%
+    mutate(
+      time_hour = as.numeric(substr(time_point, 1, 2)) +
+                  as.numeric(substr(time_point, 4, 5))/60 +
+                  as.numeric(substr(time_point, 7, 8))/3600
+    ) %>%
+    filter(time_hour %in% endpoints)
+
+  p_end <- ggplot(dr_plate_end, aes(x = log10_dose, y = growth, color = replica)) +
+    geom_point(size = 2) +   # points instead of lines
+    facet_grid(rows = vars(time_hour), cols = vars(treatment)) +
+    scale_x_continuous(
+      breaks = unique(dr_plate_end$log10_dose),
+      labels = unique(dr_plate_end$dose_label)
+    ) +
+    scale_y_continuous(
+      limits = c(0, 1),
+      breaks = seq(0, 1, 0.25)
+    ) +
+    scale_color_discrete(name = "Replica") +
+    labs(
+      x = "Dose",
+      y = "Growth (OD)",
+      title = "Growth Response at End-point Measurements by Dose"
+    ) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+      strip.text = element_text(size = 10)
+    )
+
+  # Save PDF
+  today <- format(Sys.Date(), "%Y%m%d")
+  pdf_file <- paste0("product/dr_plate_endpoints_", today, ".pdf")
+  ggsave(pdf_file, plot = p_end, width = 14, height = 8)
+  
+#+end_src
+
+#+RESULTS:
+: Warning message:
+: [1m[22mRemoved 132 rows containing missing values or
+: values outside the scale range (`geom_point()`).
+
+
+* Part 4
+These plots show the drug inhibition and growth response curves with increasing drug doses across replicates. 
+For the drug inhibition plots, the plots with higher doses have steeper growth curves during the exponential phase as time increases.
+By eye, I can tell there are different lines, but I could not get error bars or confidence tubes to note if they are statistically significant.
+
+There were a lot of missing data points in the latter time points of the growth response, possibly because the drugs inhibited the growth.
+Due to the sparsity, in latter time points there were more variation between replicates. 
+
+Time points around 12 hours would be optimal for inhibition detection.
+This is because the inhibition doesn't really show its effects until the growth phase and after 18 hours, some cultures begin to die due to inhibition.
+
+Filamentation occurs when during subinhibiting growth.
+Completely blocking filamentation without completely stopping growth will reduce pathogenicity. 
+
+[[./product/dr_plate_20260121.pdf]]
+[[./product/dr_plate_endpoints_20260121.pdf]]
