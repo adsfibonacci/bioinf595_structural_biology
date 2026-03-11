@@ -103,40 +103,42 @@ dms = dms[dms["aa"] != "*"]
 valid_aas = list("ACDEFGHIKLMNPQRSTVWY")
 dms = dms[dms["aa"].isin(valid_aas)]
 
+pose = pyrosetta.pose_from_file("data/relaxed.pdb")
+scorefxn = pyrosetta.get_score_function()
 
+results = []
 
 def compute_ddg(pose, pdb_pos, mutant_aa):
 
-  pose_mut = pose.clone()
+    pose_mut = pose.clone()
 
-  pose_index = pose_mut.pdb_info().pdb2pose(chain='A', res=int(pdb_pos))
+    pose_index = pose_mut.pdb_info().pdb2pose(chain='A', res=int(pdb_pos))
 
-  if pose_index == 0:
-      return None
+    if pose_index == 0:
+        return None
 
-  wt_score = scorefxn(pose_mut)
+    wt_score = scorefxn(pose_mut)
 
-  # mutate + repack neighbors
-  pack(pose_mut, pose_index, mutant_aa, scorefxn)
+    mutator = pyrosetta.rosetta.protocols.simple_moves.MutateResidue(
+        pose_index,
+        mutant_aa
+    )
+    mutator.apply(pose_mut)
 
-  mut_score = scorefxn(pose_mut)
+    packer = pyrosetta.rosetta.protocols.minimization_packing.PackRotamersMover(scorefxn)
+    packer.apply(pose_mut)
 
-  return mut_score - wt_score  
+    mut_score = scorefxn(pose_mut)
 
-for pose_file in ["relaxed.pdb", "7F53.cif", "7F58.cif", "8QJ2.cif"]:
-  pose = pyrosetta.pose_from_file(f"data/{pose_file}")
-  
-  scorefxn = pyrosetta.get_score_function()
-  
-  results = []
+    return mut_score - wt_score
 
-  for _, row in dms.iterrows():
+
+for _, row in dms.iterrows():
 
     pos = int(row["pos"])
     aa = row["aa"]
 
-    ddg = compute_ddg(pose, pos, aa)
-
+    
     if ddg is None:
         continue
 
@@ -145,14 +147,13 @@ for pose_file in ["relaxed.pdb", "7F53.cif", "7F58.cif", "8QJ2.cif"]:
         "aa": aa,
         "pred_ddg": ddg
     })
-    pass
-  results_df = pd.DataFrame(results)
 
-  results_df.to_csv(
-    f"product/{pose_file}_rosetta_ddg.tsv",
+results_df = pd.DataFrame(results)
+
+results_df.to_csv(
+    "product/mc4r_rosetta_ddg.tsv",
     sep="\t",
     index=False
-  )
-  
-  print(f"Saved predictions for {pose_file}:", len(results_df))
-  pass
+)
+
+print("Saved predictions:", len(results_df))

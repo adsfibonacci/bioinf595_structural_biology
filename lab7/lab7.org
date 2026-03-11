@@ -1,9 +1,26 @@
 #+setupfile: ~/.emacs.d/latex.org
 #+title: Lab 7
-#+property: header-args:R :session *R* :exports both :eval yes
-#+property: header-args:Python :session *Python* :results output :exports both :eval yes :tangle ./src/script.py
-#+property: header-args:Bash :session *Bash* :exports both :eval yes
+#+property: header-args:R :session *R* :exports both :eval no
+#+property: header-args:Python :session *Python* :results output :exports both :tangle ./src/script.py :eval no
+#+property: header-args:Bash :session *Bash* :exports both :eval no
 
+The link to the entire directory is [[https://github.com/adsfibonacci/bioinf595_structural_biology/tree/master/lab7][here]].
+
+\newpage
+* Discussion (Part 4)
+The PyRosetta mutation scan predicts how mutations affect the structural stability $(\Delta\Delta G)$ of MC4R in a specific conformational state.
+Mutations that strongly destabilize the protein are likely to disrupt folding or stability, which can reduce receptor signaling activity in the experimental assay.
+A strength of this approach is that it uses a physics-based energy function to model structural interactions and identify mutations that significantly disrupt the protein structure.
+
+A weakness is the G proteins aren't static and shift between active and inactive states during signalling, which means the ligand binding, G-protein coupling, and membrane interactions aren't perfectly modeled.
+
+ref2015 is good for physical interactions and physics forces such as van der Waals forces and hydrogen bonds.
+It doesn't necessarily capture the long range electrostatics and conformational variance due to the alternation between active and inactive states.
+beta_jan25 and newer energy functions are trained on larger or more specific datasets and could capture these other factors, even if only implicitly.
+
+A limitation of the sampling strategy is the PyRosetta mutation scan only repacks mutated residues and nearby side chains, while the backbone and most of the protein structure remain fixed. This limited sampling may miss important structural rearrangements that occur after a mutation, especially in flexible regions of the protein.
+
+\newpage
 * Data Processing
 #+begin_src R
   library(tidyverse)
@@ -80,7 +97,7 @@
 #+RESULTS:
 : product/mc4r_volcano.pdf
 
-#+begin_src R
+#+begin_src R :exports code
   best_scores <- mc4r %>%
   group_by(pos) %>%
   summarize(score = max(statistic, na.rm = TRUE)) %>%
@@ -425,7 +442,7 @@
 | A | 331 | 3.20110251719705 |
 | A | 332 | 3.32139777668981 |
 
-#+begin_src bash
+#+begin_src bash :exports none
   python src/set_bfactors.py \
     --input_cif data/8QJ2.cif \
     --scores_tsv intermediate/mc4r_scores.tsv \
@@ -459,8 +476,12 @@
 | Wrote | modified  | CIF | to    | product/7F58_scored.cif |    |                 |                             |                             |
 | To    | visualize | in  | pymol | `spectrum               | b, | blue_white_red, | minimum=1.1101518557248142, | maximum=15.530442954621432` |
 
+\newpage
 * Pyrosetta Mutations
+The last file, 8QJ2 is taking a while.
+If it is not in the final submission, something happened that caused it to fail part way through.
 
+The correlations were statistically significant due to the large number of observations, but the effect sizes were small. This suggests Rosetta stability predictions capture some structural effects but do not fully explain functional outcomes measured in the deep mutational scan.
 #+begin_src python
   import os
   import pandas as pd
@@ -498,6 +519,8 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
 <pyrosetta.rosetta.protocols.relax.FastRelax object at 0x7fdef3188170>
 #+end_example
 
+\newpage
+* Plots
 #+begin_src python
   def pack(pose, posi, amino, scorefxn):
 
@@ -596,37 +619,34 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
   valid_aas = list("ACDEFGHIKLMNPQRSTVWY")
   dms = dms[dms["aa"].isin(valid_aas)]
 
-  pose = pyrosetta.pose_from_file("data/relaxed.pdb")
-  scorefxn = pyrosetta.get_score_function()
 
-  results = []
 
   def compute_ddg(pose, pdb_pos, mutant_aa):
 
-      pose_mut = pose.clone()
+    pose_mut = pose.clone()
 
-      pose_index = pose_mut.pdb_info().pdb2pose(chain='A', res=int(pdb_pos))
+    pose_index = pose_mut.pdb_info().pdb2pose(chain='A', res=int(pdb_pos))
 
-      if pose_index == 0:
-          return None
+    if pose_index == 0:
+        return None
 
-      wt_score = scorefxn(pose_mut)
+    wt_score = scorefxn(pose_mut)
 
-      mutator = pyrosetta.rosetta.protocols.simple_moves.MutateResidue(
-          pose_index,
-          mutant_aa
-      )
-      mutator.apply(pose_mut)
+    # mutate + repack neighbors
+    pack(pose_mut, pose_index, mutant_aa, scorefxn)
 
-      packer = pyrosetta.rosetta.protocols.minimization_packing.PackRotamersMover(scorefxn)
-      packer.apply(pose_mut)
+    mut_score = scorefxn(pose_mut)
 
-      mut_score = scorefxn(pose_mut)
+    return mut_score - wt_score  
 
-      return mut_score - wt_score
+  for pose_file in ["relaxed.pdb", "7F53.cif", "7F58.cif", "8QJ2.cif"]:
+    pose = pyrosetta.pose_from_file(f"data/{pose_file}")
+    
+    scorefxn = pyrosetta.get_score_function()
+    
+    results = []
 
-
-  for _, row in dms.iterrows():
+    for _, row in dms.iterrows():
 
       pos = int(row["pos"])
       aa = row["aa"]
@@ -641,16 +661,119 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
           "aa": aa,
           "pred_ddg": ddg
       })
+      pass
+    results_df = pd.DataFrame(results)
 
-  results_df = pd.DataFrame(results)
+    results_df.to_csv(
+      f"product/{pose_file}_rosetta_ddg.tsv",
+      sep="\t",
+      index=False
+    )
+    
+    print(f"Saved predictions for {pose_file}:", len(results_df))
+    pass
+#+end_src
 
-  results_df.to_csv(
-      "product/mc4r_rosetta_ddg.tsv",
+#+RESULTS:
+
+#+begin_src python :tangle no
+  import pandas as pd
+  import numpy as np
+
+  dms = pd.read_csv("data/mc4r_dms.tsv", sep="\t")
+  filename = "relaxed.pdb" # "7F53.cif" # "7F58.cif"
+  rosetta = pd.read_csv(f"product/{filename}_rosetta_ddg.tsv", sep="\t")
+
+  # remove nonsense
+  dms = dms[dms["aa"] != "*"]
+
+  # create compound_dose column (for faceting)
+  dms["compound_dose"] = dms["compound"] + "_" + dms["dose"]
+
+  # merge predictions with experiment
+  merged = dms.merge(
+      rosetta,
+      on=["pos","aa"],
+      how="inner"
+  )
+
+  merged["exp_ddg"] = -merged["log2FoldChange"]
+  merged["rosetta_trans"] = np.sign(merged["pred_ddg"]) * np.log10(np.abs(merged["pred_ddg"]) + 1)
+
+  merged = merged.replace([np.inf, -np.inf], np.nan).dropna()
+
+  import seaborn as sns
+  import matplotlib.pyplot as plt
+
+  g = sns.lmplot(
+      data=merged,
+      x="rosetta_trans",
+      y="exp_ddg",
+      col="pathway",
+      row="compound_dose",
+      scatter_kws={"alpha":0.4, "s":10},
+      line_kws={"color":"red"},
+      height=3
+  )
+
+  g.set_axis_labels(
+      "Rosetta predicted ddG (log10 transformed)",
+      "-log2FoldChange (experimental)"
+  )
+
+  plt.tight_layout()
+  plt.savefig(f"product/{filename}_rosetta_vs_experiment.png", dpi=300)
+  plt.savefig(f"product/{filename}_rosetta_vs_experiment.pdf")
+
+  from scipy.stats import spearmanr
+
+  corr_results = []
+
+  for (pathway, compound, dose), group in merged.groupby(["pathway","compound","dose"]):
+
+      if len(group) < 5:
+          continue
+
+      rho, p = spearmanr(
+          group["pred_ddg"],
+          group["exp_ddg"]
+      )
+
+      corr_results.append({
+          "pathway": pathway,
+          "compound": compound,
+          "dose": dose,
+          "spearman_rho": rho,
+          "p_value": p,
+          "n": len(group)
+      })
+
+  corr_df = pd.DataFrame(corr_results)
+
+  corr_df.to_csv(
+      f"product/{filename}_spearman_correlations.tsv",
       sep="\t",
       index=False
   )
 
-  print("Saved predictions:", len(results_df))  
+  print(corr_df)  
 #+end_src
 
 #+RESULTS:
+#+begin_example
+   pathway compound  ...        p_value      n
+0       Gq     THIQ  ...   0.000000e+00  65408
+1       Gq     THIQ  ...  3.171891e-166  65408
+2       Gq     THIQ  ...  1.348204e-258  65408
+3       Gq     aMSH  ...   0.000000e+00  65408
+4       Gq     aMSH  ...   0.000000e+00  65408
+5       Gq     aMSH  ...   0.000000e+00  65408
+6       Gs     THIQ  ...   0.000000e+00  65408
+7       Gs     THIQ  ...   0.000000e+00  65408
+8       Gs     THIQ  ...   0.000000e+00  65408
+9       Gs     aMSH  ...   0.000000e+00  65408
+10      Gs     aMSH  ...   0.000000e+00  65408
+11      Gs     aMSH  ...   0.000000e+00  65408
+
+[12 rows x 6 columns]
+#+end_example
