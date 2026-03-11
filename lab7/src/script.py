@@ -103,8 +103,6 @@ dms = dms[dms["aa"] != "*"]
 valid_aas = list("ACDEFGHIKLMNPQRSTVWY")
 dms = dms[dms["aa"].isin(valid_aas)]
 
-
-
 def compute_ddg(pose, pdb_pos, mutant_aa):
 
   pose_mut = pose.clone()
@@ -149,7 +147,7 @@ for pose_file in ["relaxed.pdb", "7F53.cif", "7F58.cif", "8QJ2.cif"]:
   results_df = pd.DataFrame(results)
 
   results_df.to_csv(
-    f"product/{pose_file}_rosetta_ddg.tsv",
+    f"intermediate/{pose_file}_rosetta_ddg.tsv",
     sep="\t",
     index=False
   )

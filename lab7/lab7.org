@@ -441,12 +441,12 @@ A limitation of the sampling strategy is the PyRosetta mutation scan only repack
 | A | 330 |   5.290558954131 |
 | A | 331 | 3.20110251719705 |
 | A | 332 | 3.32139777668981 |
-
+The following plots are listed as ~product/{protein}_bfactors.png~. 
 #+begin_src bash :exports none
   python src/set_bfactors.py \
     --input_cif data/8QJ2.cif \
     --scores_tsv intermediate/mc4r_scores.tsv \
-    --output_cif product/8QJ2_scored.cif \
+    --output_cif intermediate/8QJ2_scored.cif \
     --chain_id_col chain_id \
     --res_id_col res_id \
     --score_col score
@@ -454,7 +454,7 @@ A limitation of the sampling strategy is the PyRosetta mutation scan only repack
   python src/set_bfactors.py \
     --input_cif data/7F53.cif \
     --scores_tsv intermediate/mc4r_scores.tsv \
-    --output_cif product/7F53_scored.cif \
+    --output_cif intermediate/7F53_scored.cif \
     --chain_id_col chain_id \
     --res_id_col res_id \
     --score_col score
@@ -462,7 +462,7 @@ A limitation of the sampling strategy is the PyRosetta mutation scan only repack
   python src/set_bfactors.py \
     --input_cif data/7F58.cif \
     --scores_tsv intermediate/mc4r_scores.tsv \
-    --output_cif product/7F58_scored.cif \
+    --output_cif intermediate/7F58_scored.cif \
     --chain_id_col chain_id \
     --res_id_col res_id \
     --score_col score  
@@ -520,7 +520,7 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
 #+end_example
 
 \newpage
-* Plots
+
 #+begin_src python
   def pack(pose, posi, amino, scorefxn):
 
@@ -609,6 +609,7 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
 : 7F53 Old Energy: -414.4993230604293
 : 7F53 New Energy: -425.269063639838
 
+\newpage
 #+begin_src python
   dms = pd.read_csv("data/mc4r_dms.tsv", sep="\t")
 
@@ -618,8 +619,6 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
   # keep only canonical residues
   valid_aas = list("ACDEFGHIKLMNPQRSTVWY")
   dms = dms[dms["aa"].isin(valid_aas)]
-
-
 
   def compute_ddg(pose, pdb_pos, mutant_aa):
 
@@ -665,7 +664,7 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
     results_df = pd.DataFrame(results)
 
     results_df.to_csv(
-      f"product/{pose_file}_rosetta_ddg.tsv",
+      f"intermediate/{pose_file}_rosetta_ddg.tsv",
       sep="\t",
       index=False
     )
@@ -676,13 +675,17 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
 
 #+RESULTS:
 
-#+begin_src python :tangle no
+\newpage
+* Plots
+Some of the spearman plots look very flat, but others are grouped into two bubbles.
+There is not significant correlation though. 
+#+begin_src python :tangle no 
   import pandas as pd
   import numpy as np
 
   dms = pd.read_csv("data/mc4r_dms.tsv", sep="\t")
-  filename = "relaxed.pdb" # "7F53.cif" # "7F58.cif"
-  rosetta = pd.read_csv(f"product/{filename}_rosetta_ddg.tsv", sep="\t")
+  filename = "8QJ2.cif" # "relaxed.pdb" # "7F53.cif" # "7F58.cif"
+  rosetta = pd.read_csv(f"intermediate/{filename}_rosetta_ddg.tsv", sep="\t")
 
   # remove nonsense
   dms = dms[dms["aa"] != "*"]
@@ -761,19 +764,19 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu 2026.06+release.e5
 
 #+RESULTS:
 #+begin_example
-   pathway compound  ...        p_value      n
-0       Gq     THIQ  ...   0.000000e+00  65408
-1       Gq     THIQ  ...  3.171891e-166  65408
-2       Gq     THIQ  ...  1.348204e-258  65408
-3       Gq     aMSH  ...   0.000000e+00  65408
-4       Gq     aMSH  ...   0.000000e+00  65408
-5       Gq     aMSH  ...   0.000000e+00  65408
-6       Gs     THIQ  ...   0.000000e+00  65408
-7       Gs     THIQ  ...   0.000000e+00  65408
-8       Gs     THIQ  ...   0.000000e+00  65408
-9       Gs     aMSH  ...   0.000000e+00  65408
-10      Gs     aMSH  ...   0.000000e+00  65408
-11      Gs     aMSH  ...   0.000000e+00  65408
+   pathway compound  ...       p_value      n
+0       Gq     THIQ  ...  1.980643e-37  65408
+1       Gq     THIQ  ...  9.439831e-75  65408
+2       Gq     THIQ  ...  4.420232e-53  65408
+3       Gq     aMSH  ...  6.187739e-09  65408
+4       Gq     aMSH  ...  2.163581e-15  65408
+5       Gq     aMSH  ...  1.331479e-12  65408
+6       Gs     THIQ  ...  6.914165e-54  65408
+7       Gs     THIQ  ...  1.568962e-78  65408
+8       Gs     THIQ  ...  1.190724e-74  65408
+9       Gs     aMSH  ...  2.327624e-82  65408
+10      Gs     aMSH  ...  8.716206e-67  65408
+11      Gs     aMSH  ...  6.025364e-69  65408
 
 [12 rows x 6 columns]
 #+end_example
