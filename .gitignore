@@ -17,3 +17,7 @@ intermediates/
 *.tar
 *.gz
 *.ziplab4/product/
+lab8/data
+lab8/intermediates
+lab8/debug_data
+lab8/wandb

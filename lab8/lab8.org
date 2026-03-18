@@ -20,8 +20,17 @@ Best trial:
 {'hidden_dim': 2048, 'n_layers': 5, 'batch_size': 128, 'learning_rate': 3e-4, 'dropout': 0.23213097511521028}
 Best val loss: 21.651360869407654
 #+end_export
-The biggest effect on the jaggedness of the curves was dropout. Next time I will implement early stopping so the trials can terminate in fewer epochs and not overfit the models.
+The biggest effect on the jaggedness of the curves was dropout.
+Next time I will implement early stopping so the trials can terminate in fewer epochs and not overfit the models.
+I would also increase the optuna trials from 75 to 150 to get better validation curves. 
 
 The best parameters on the small dataset are as follows. 
 [[./product/small_val.png]]
 [[./product/small_train.png]]
+
+The best parameters on the medium dataset are as follows.
+[[./product/medium_val.png]]
+[[./product/medium_train.png]]
+
+In both of these, early stopping would have benefitted the model since there is overfitting.
+
