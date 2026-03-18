@@ -1,0 +1,21 @@
+#+setupfile: ~/.emacs.d/latex.org
+#+title: Lab 8
+
+The code is stored on GitHub.
+
+
+Optuna selected the following as the best hyperparameters. 
+#+begin_export
+Best trial:
+{'hidden_dim': 2048, 'n_layers': 5, 'batch_size': 128, 'learning_rate': 3, 'dropout': 0.23213097511521028}
+Best val loss: 21.651360869407654
+#+end_export
+
+Some of the hyperparameter trials were not good, as seen in the last trial
+[[./product/trial74_train_loss.png]]
+[[./product/trial74_val_loss.png]]
+
+However, convergence was observed since some trials had smooth training and validation curves.
+[[./product/trial60_train_loss.png]]
+[[./product/trial60_val_loss.png]]
+
