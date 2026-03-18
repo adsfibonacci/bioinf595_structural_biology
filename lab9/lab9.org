@@ -1,0 +1,22 @@
+#+setupfile:~/.emacs.d/latex.org
+#+property: header-args:R :results output :exports code :eval yes :session *R* 
+
+* Installation
+#+begin_src R
+  install.packages(
+    "cmdstanr",
+    repos=c('https://stan-dev.r-universe.dev', getOption("repos")))
+  cmdstanr::install_cmdstan()
+  fild <- file.path(cmdstan_path(), "examples", "bernoulli", "bernoulli.stan")
+  mod <- cmdstan_model(file)
+
+  install.packages("brms")
+  install.packages("loo")
+  install.packages("posterior")
+  install.packages("bayesplot")
+  install.packages("shinystan")
+  options(brms.backend="cmdstanr")
+  options(mc.cores=4)
+#+end_src
+
+* Inspection
