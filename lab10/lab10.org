@@ -4,6 +4,8 @@
 
 * Report
 ** Usage
+I sampled smiles from the Irwin Lab everted zinc screen, found here. https://huggingface.co/datasets/IrwinLab/LSD_NSP3_Mac1_Gahbauer_2022_Everted_ZINC22_screen
+
 Representing the chemicals in a continuous space means that obtaining drugs in a local neighborhood is well defined.
 When new drugs are selected from this neighborhood, it can give a basis for what drugs have similar properties to existing ones and provides a starting point for what drugs to search.
 ** UMAP
