@@ -1,0 +1,60 @@
+#+setupfile: ~/.emacs.d/latex.org
+#+title: Lab 11 Molecular Docking
+
+* Testing 
+There are 4 Hydrogen bonds between the ligand and the protein
+
+| SMALL Residue    | Ligand Atom | Distance (A) |
+|------------------+-------------+--------------|
+| Alanine 102      | N1          |        2.097 |
+| Aspartine 165    | O4          |        2.210 |
+| Glutamine 69 OE2 | H9          |        2.413 |
+| Glutamine 69 OE2 | H8          |        2.188 |
+
+| Descriptor                    |      Value | Descriptor                    |      Value |
+|-------------------------------+------------+-------------------------------+------------|
+| Continuous Score              | -61.017719 | desc VOS Hydrophilic atm vo   |        1.0 |
+| desc Continuous es energy     |   -6.67997 | desc VOS hydrophobic atm vo   |        1.0 |
+| desc Continuous vdw energy    | -54.337749 | desc VOS neg chrg atm vo      |   0.791001 |
+| desc FPS es energy            |  -6.679937 | desc VOS pos chrg atm vo      |   0.822563 |
+| desc FPS es fp numres         |        284 | Descriptor Score              | -58.773136 |
+| desc FPS es fps               |   2.244584 | DOCK Rotatable Bonds          |          9 |
+| desc FPS hb fp numres         |        284 | Footprint Similarity Score    |   2.244584 |
+| desc FPS num hbond            |          4 | H-Bonds                       |          4 |
+| desc FPS vdw energy           | -54.365158 | HBond Acceptors               |          9 |
+| desc FPS vdw fp numres        |        284 | HBond Donors                  |          4 |
+| desc FPS vdw fps              |        0.0 | Heavy Atoms                   |         30 |
+| desc FPS vdw+es energy        | -61.045097 | Hungarian Matching Similarity |       -5.0 |
+| desc HMS num ref hvy atms     |         30 | Internal energy repulsive     |  13.165473 |
+| desc HMS num unmtchd hvy atms |          0 | Molecular Weight              |    426.859 |
+| desc HMS rmsd mtchd hvy atms  |        0.0 | Name                          |   5ZV2.lig |
+| desc VOS geometric vo         |        1.0 | Property Volume Score         |   0.935594 |
+| desc VOS hvy atom vo          |        1.0 | Rating                        |  (unrated) |
+
+[[./product/testing.png]]
+
+
+* Cartmin
+I removed all ligands with a Continuous Score over -55, a Footprint Similarity Score under 12.5, a Hungarian Matching Similarity Score over 1.5, a Property Volume Score under 0.55, and any that did not H bond to residues on the protein.
+After this removal, there were only 15 left. I manually went through this set and all molecules were in a similar length and orientation to each other.
+The common residues for H bonds are Aspartine 165, Glutamine 69 OE2, and Alanine 102.
+
+| Ligand ID    | SMILES                                                                  |
+| ------------ | ----------------------------------------------------------------------- |
+| ZINC15726433 | CCNC(=O)[C@H]1CC[N@H+](Cc2nc%28-c3ccc%28OC%29c%28OC%29c3%29no2)CC1      |
+| ZINC32891679 | C[C@@H](c1cccc%28NC%28=O%29c2ccccc2%29c1)N(C)C(=O)CCn1c(=O)oc2ccccc21   |
+| ZINC44308404 | CCCNC(=O)C[N@H+]1CC[C@H](NC%28=O%29Nc2ccc3oc%28C4CC4%29nc3c2)CC1        |
+| ZINC90883402 | C[C@H]([NH2+]Cc1ccc%28-c2ccc3c%28c2%29C[C@@H]%28C%29O3%29cc1)c1cnn(C)c1 |
+| ZINC33310196 | CCCNC(=O)Nc1ccc(NC(=O)N2CCC(C(=O)NCC3CC3)CC2)cc1                        |
+| ZINC23338973 | COc1cccc(-c2cccc(N3CCC([NH2+]C[C@H]4CC(=O)N(C)C4)CC3)c2)c1              |
+| ZINC08428037 | COc1ccc(NC(=O)c2ccc(C[N@H+](C)Cc3ccccc3F)cc2)cc1                        |
+| ZINC12447200 | CCn1ccnc1CNc1ccc(-c2nc(-c3ccccc3F)no2)c[nH+]1                           |
+| ZINC64719881 | O=C(CCCn1c(=O)oc2ccccc21)NCCC1=c2ccccc2=[NH+]C1                           |
+| ZINC48355563 | O=C([O-])c1ccn(-c2ccc(NS(=O)(=O)c3ccc(N4CCCC4=O)cc3)cc2)n1              |
+| ZINC73306518 | C[NH+](C)CC(=O)Nc1ccc(NC(=O)c2ccc(-n3ccnc3)nc2)cc1                      |
+| ZINC89773358 | C[NH+](C)CC(=O)Nc1ccc(NC(=O)c2ccc(-n3ccnn3)cc2)cc1                      |
+| ZINC72412269 | COc1ccc(OC[C@H]2CC[N@H+](C[C@]3%28O%29CCC[NH2+]C3)CC2)cc1               |
+| ZINC01351668 | O=C(Nc1ccc(C[NH+]2CCCCC2)cc1)c1cc2ccccc2oc1=O                           |
+| ZINC29323279 | O=C(NCc1ccc(N2CCCC2)[nH+]c1)NCc1ccc2c(c1)OCCO2                          |
+
+These are organized in decreasing Continuous Scoring binding. 
