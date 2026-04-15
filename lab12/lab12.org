@@ -1,0 +1,171 @@
+#+setupfile: ~/.emacs.d/latex.org
+#+title: Lab 12 Binder Design
+
+* Boltzgen
+First I created the DAMGO ~spec.yaml~ file since it didn't exist. I found the SMILES from Wikipedia, then ran the following code for each of ~DAMGO~, ~morphine~, ~naltrexone~, and ~nitazene~.
+
+#+begin_src bash
+boltzgen run "intermediate/$RUN_ID/spec.yaml" \
+  --output "$LAB_PATH/intermediate/$RUN_ID/merged/task-outputs" \
+  --num_designs 5 \
+  --protocol protein-small_molecule \
+  --cache $LAB_PATH/.cache \
+  --reuse
+#+end_src
+
+
+* Inspection
+
+** Overview of filtering behavior across all targets
+Across DAMGO, morphine, naltrexone, and nitazene, the pipeline is consistently dominated by structural RMSD-based filters:
+
+- filter_rmsd \leq 2.5 \,\text{\AA}
+- filter_rmsd_design \leq 2.5 \,\text{\AA}
+- designfolding-filter_rmsd \leq 2.5 \,\text{\AA}
+
+These are the primary gating constraints determining whether a design survives.
+
+Secondary sequence composition filters (ALA/GLY/GLU/LEU/VAL fractions) are weak and rarely binding across all targets.
+
+---
+
+** Yield and filtering efficiency
+
+| Target       | Generated | Passing all filters | Pass rate |
+|--------------+-----------+---------------------+----------|
+| DAMGO        | 20,000    | 11,234              | ~56%     |
+| Morphine     | 20,000    | 11,234              | ~56%     |
+| Naltrexone   | 18,839    | 12,442              | ~66%     |
+| Nitazene     | 33,465    | 26,098              | ~78%     |
+
+Key observation:
+- Nitazene is the easiest target structurally (highest survival rate).
+- DAMGO and morphine are the most constrained.
+- Naltrexone is intermediate but still relatively permissive.
+
+---
+
+** Binding quality comparison
+
+Primary metric: design_to_target_iptm
+
+| Target       | Top-set mean |
+|--------------+-------------|
+| DAMGO        | ~0.75       |
+| Morphine     | ~0.80       |
+| Naltrexone   | ~0.80+      |
+| Nitazene     | ~0.79–0.80  |
+
+Interpretation:
+- Morphine and naltrexone remain the strongest overall binders.
+- Nitazene is comparable to naltrexone in predicted binding confidence.
+- DAMGO is consistently the weakest in binding geometry quality.
+
+---
+
+** Structural confidence (PAE)
+
+Lower is better:
+
+| Target       | Mean top-set PAE |
+|--------------+------------------|
+| DAMGO        | ~2.14            |
+| Morphine     | ~2.10            |
+| Naltrexone   | ~2.10            |
+| Nitazene     | ~1.76–1.92       |
+
+Key observation:
+- Nitazene shows the lowest PAE overall, indicating the most confident structural predictions.
+- DAMGO remains the least confident among the four.
+
+---
+
+** Interaction profile differences
+
+Hydrogen bonding and salt bridges:
+
+- Morphine:
+  - Highest hydrogen bond counts among earlier targets
+  - Strong interaction density
+
+- Nitazene:
+  - Moderate-to-high hydrogen bonding (~2–2.4 in selected sets)
+  - Slightly improved salt bridge signal vs earlier targets
+
+- DAMGO:
+  - Weakest and most variable interaction pattern
+
+- Naltrexone:
+  - Moderate interactions, strong structural stability
+
+General trend:
+- Interaction richness does not always correlate with ipTM; nitazene improves structural confidence more than interaction density.
+
+---
+
+** Hydrophobic and burial signal
+
+- $\delta$ SASA is consistently strong across all targets (~400–500 range)
+- Nitazene and naltrexone show slightly higher mean burial in selected sets
+- DAMGO shows more variability and weaker clustering
+
+---
+
+** Diversity behavior (important systemic observation)
+
+Across all four targets:
+
+- Diversity parameter \alpha = 0.001
+- Effectively produces:
+  - ~100% quality-driven selection
+  - minimal sequence diversity in final 30 sets
+
+Consequences:
+- Strong clustering in num_design distributions
+- Overlap between “top-quality” and “diverse” sets
+- Final sets are highly redundant structurally
+
+---
+
+** Overall comparison across targets
+
+Difficulty ranking (hard → easy):
+
+1. DAMGO (hardest)
+   - lowest ipTM
+   - weakest interaction signal
+   - highest variability
+
+2. Morphine
+   - strongest interaction chemistry
+   - high structural confidence
+
+3. Naltrexone
+   - best balance of stability + confidence
+   - consistently low PAE
+
+4. Nitazene (easiest structurally)
+   - highest pass rate (~78%)
+   - lowest PAE overall
+   - strong structural convergence
+
+---
+
+** Key takeaways
+
+- RMSD-based structural filters dominate selection across all targets.
+- Nitazene is the most structurally “designable” target in this pipeline.
+- Morphine and naltrexone yield the highest-quality binding predictions.
+- DAMGO remains the most challenging target across all metrics.
+- Final selected sets are high-confidence but strongly redundant due to near-zero diversity pressure.
+
+* Conclusion
+
+Across all ligands:
+
+- DAMGO → high RMSD failure rate
+- Morphine → moderate improvement but still unstable
+- Naltrexone → strong structural consistency
+- Nitazene → best or near-best overall metrics
+
+RMSD-based structural filtering is the dominant constraint across all runs.
