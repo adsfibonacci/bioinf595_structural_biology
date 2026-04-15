@@ -1,0 +1,10 @@
+sequences:
+  - protein:
+      id: A
+      sequence: SLAEELLLGTITLDVTLEKFLNAKPGDVIKGKKSRPLPEELDGVIEEVDTAKDGHVRKYELKIDGNEITDTVLEGSYRVGEYTREITHKGETYTAKRKVEEFEENGKRVLKIKDEVEGKTFEIINKEEGDKLVSTGKLV
+  - ligand:
+      id: B
+      smiles: 'O[C@@H](C=C[C@@]1([H])[C@H]2CC3=CC=C4O)[C@@]5([H])[C@]1(CCN2C)C3=C4O5'
+properties:
+  - affinity:
+      binder: B

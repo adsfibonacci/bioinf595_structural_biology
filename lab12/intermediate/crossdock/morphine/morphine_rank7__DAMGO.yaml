@@ -1,0 +1,10 @@
+sequences:
+  - protein:
+      id: A
+      sequence: MIIPTKEAIECLVNAIKLAKEGKYDEAVEHIRKAAELAGVPEEVIEPLIKLFKEGKVDEAIDLILKETASPELKEAVEKIR
+  - ligand:
+      id: B
+      smiles: 'C[C@@H](NC([C@@H](N)CC1=CC=C(O)C=C1)=O)C(NCC(N([C@H](C(NCCO)=O)CC2=CC=CC=C2)C)=O)=O'
+properties:
+  - affinity:
+      binder: B

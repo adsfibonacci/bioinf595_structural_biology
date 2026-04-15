@@ -335,3 +335,11 @@ rank00041_task-26766364-4_spec_895 RMSD =    1.719 (26 atoms)
 Most of these had 3 or 4 \alpha helices, but there was an occasional \beta sheet and \alpha helices surrounding the ligand.
 BLASTP resutls show binding proteins could also be ubiquitin Mdm2 like or bromodomain containing binders.
 FoldSEEK agrees with the ubiquitin Mdm2 like interpretation. 
+
+* Cross Docking
+[[./plots/crossdock_all_pairs.png]]
+There is small clustering around the diagonal, but there are a lot of points away from the diagonal.
+This means binding affinity to one ligand does not reliably predict binding affinity to another. 
+
+* ESM Embeddings
+To test this, I would first compute ESM-2 embeddings for each designed protein sequence and project them into 2D using UMAP, then color points by their intended ligand to see if designs cluster by target. In parallel, I would generate structural interaction fingerprints for each receptor–ligand complex using PLIP, summarize interaction types into feature vectors, and similarly visualize or cluster them. By comparing these plots, I would assess whether designs group by ligand specificity, whether sequence similarity corresponds to similar binding interactions, and whether distinct clusters correspond to selective versus promiscuous binders.
