@@ -1,19 +1,19 @@
-\contentsline {section}{\numberline {1}Boltzgen}{1}{section.1}%
-\contentsline {section}{\numberline {2}Inspection}{2}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Overview of filtering behavior across all targets}{2}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Yield and filtering efficiency}{2}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Binding quality comparison}{2}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Structural confidence (PAE)}{3}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}Interaction profile differences}{3}{subsection.2.5}%
+\contentsline {section}{\numberline {1}Boltzgen}{2}{section.1}%
+\contentsline {section}{\numberline {2}Inspection}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Overview of filtering behavior across all targets}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Yield and filtering efficiency}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Binding quality comparison}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Structural confidence (PAE)}{4}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Interaction profile differences}{4}{subsection.2.5}%
 \contentsline {subsection}{\numberline {2.6}Hydrophobic and burial signal}{4}{subsection.2.6}%
 \contentsline {subsection}{\numberline {2.7}Diversity behavior (important systemic observation)}{4}{subsection.2.7}%
-\contentsline {subsection}{\numberline {2.8}Overall comparison across targets}{4}{subsection.2.8}%
+\contentsline {subsection}{\numberline {2.8}Overall comparison across targets}{5}{subsection.2.8}%
 \contentsline {subsection}{\numberline {2.9}Key takeaways}{5}{subsection.2.9}%
-\contentsline {subsection}{\numberline {2.10}Conclusion}{5}{subsection.2.10}%
-\contentsline {section}{\numberline {3}PyMOL}{5}{section.3}%
-\contentsline {subsection}{\numberline {3.1}DAMGO}{5}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Morphine}{7}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Naltrexone}{8}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Nitazene}{9}{subsection.3.4}%
-\contentsline {section}{\numberline {4}Cross Docking}{10}{section.4}%
-\contentsline {section}{\numberline {5}ESM Embeddings}{10}{section.5}%
+\contentsline {subsection}{\numberline {2.10}Conclusion}{6}{subsection.2.10}%
+\contentsline {section}{\numberline {3}PyMOL}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}DAMGO}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Morphine}{8}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Naltrexone}{9}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Nitazene}{10}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Cross Docking}{11}{section.4}%
+\contentsline {section}{\numberline {5}ESM Embeddings}{12}{section.5}%

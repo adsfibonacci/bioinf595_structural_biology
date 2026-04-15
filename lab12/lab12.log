@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.4.15)  15 APR 2026 10:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.4.15)  15 APR 2026 10:38
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -874,6 +874,11 @@ File: uesint.fd
 \tf@toc=\write6
 \openout6 = `lab12.toc'.
 
+
+[1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/enc/
+dvips/cm-super/cm-super-t1.enc}]
 LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 8
 5.
 
@@ -891,93 +896,87 @@ Package mdframed Info: mdframed detected package amsthm
 E9.pygtex
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <8> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 2.
-) [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/enc/
-dvips/cm-super/cm-super-t1.enc}] [2{/usr/share/texmf/fonts/enc/dvips/cm-super/c
-m-super-ts1.enc}] [3] [4]
+) [2] [3{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
+[4] [5] [6]
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
-(mdframed)              on input line 321.
+(mdframed)              on input line 305.
 \openout3 = `lab12.pyg'.
 
 
-(./_minted-lab12/325C05A242E9A697E5704D5F9AFFA8D2A117A4FD7AAF297DC0A517EAEBE16C
+(./_minted-lab12/625E8AC9283D4A4BA07868C71EB89D53A117A4FD7AAF297DC0A517EAEBE16C
 9E.pygtex
-Overfull \hbox (58.23628pt too wide) in paragraph at lines 2--2
-\T1/cmtt/m/n/8 /home/alex/Documents/bioinf595_structural_biology/lab12/intermed
-iate/$RUNID/merged/final_ranked_designs/final_30_designs/|  
+Overfull \hbox (19.99562pt too wide) in paragraph at lines 2--2
+\T1/cmtt/m/n/8 ~/Documents/bioinf595_structural_biology/lab12/intermediate/$RUN
+ID/merged/final_ranked_designs/final_30_designs/|  
  []
 
 )
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
-(mdframed)              on input line 326.
+(mdframed)              on input line 310.
 \openout3 = `lab12.pyg'.
 
 
 (./_minted-lab12/EA1897F5FBA79DCB4904045116C6CF99A117A4FD7AAF297DC0A517EAEBE16C
-9E.pygtex) [5]
-<./intermediate/DAMGO/axis-view.png, id=139, 546.3612pt x 241.8636pt>
+9E.pygtex)
+<./intermediate/DAMGO/axis-view.png, id=140, 546.3612pt x 241.8636pt>
 File: ./intermediate/DAMGO/axis-view.png Graphic file (type png)
 <use ./intermediate/DAMGO/axis-view.png>
 Package pdftex.def Info: ./intermediate/DAMGO/axis-view.png  used on input line
- 361.
+ 345.
 (pdftex.def)             Requested size: 450.43253pt x 199.40338pt.
-<./intermediate/DAMGO/outside-view.png, id=141, 546.3612pt x 241.8636pt>
+<./intermediate/DAMGO/outside-view.png, id=142, 546.3612pt x 241.8636pt>
 File: ./intermediate/DAMGO/outside-view.png Graphic file (type png)
 <use ./intermediate/DAMGO/outside-view.png>
 Package pdftex.def Info: ./intermediate/DAMGO/outside-view.png  used on input l
-ine 364.
+ine 348.
 (pdftex.def)             Requested size: 450.43253pt x 199.40338pt.
- [6 <./intermediate/DAMGO/axis-view.png> <./intermediate/DAMGO/outside-view.png
->]
+ [7 <./intermediate/DAMGO/axis-view.png>]
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
-(mdframed)              on input line 372.
+(mdframed)              on input line 356.
 \openout3 = `lab12.pyg'.
 
 
 (./_minted-lab12/AB0E8264577A9229CCB1532341CC24DBA117A4FD7AAF297DC0A517EAEBE16C
-9E.pygtex)
-<./intermediate/morphine/view.png, id=148, 546.3612pt x 241.8636pt>
+9E.pygtex) [8 <./intermediate/DAMGO/outside-view.png>]
+<./intermediate/morphine/view.png, id=157, 546.3612pt x 241.8636pt>
 File: ./intermediate/morphine/view.png Graphic file (type png)
 <use ./intermediate/morphine/view.png>
-Package pdftex.def Info: ./intermediate/morphine/view.png  used on input line 4
-09.
+Package pdftex.def Info: ./intermediate/morphine/view.png  used on input line 3
+93.
 (pdftex.def)             Requested size: 450.43253pt x 199.40338pt.
- [7]
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
-(mdframed)              on input line 417.
+(mdframed)              on input line 401.
 \openout3 = `lab12.pyg'.
 
 
 (./_minted-lab12/33200B291E246867427B8AF8E60985C6A117A4FD7AAF297DC0A517EAEBE16C
 9E.pygtex)
-<./intermediate/naltrexone/view.png, id=155, 546.3612pt x 241.8636pt>
+<./intermediate/naltrexone/view.png, id=158, 546.3612pt x 241.8636pt>
 File: ./intermediate/naltrexone/view.png Graphic file (type png)
 <use ./intermediate/naltrexone/view.png>
 Package pdftex.def Info: ./intermediate/naltrexone/view.png  used on input line
- 452.
+ 436.
 (pdftex.def)             Requested size: 450.43253pt x 199.40338pt.
- [8 <./intermediate/morphine/view.png>]
+ [9 <./intermediate/morphine/view.png>]
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
-(mdframed)              on input line 460.
+(mdframed)              on input line 444.
 \openout3 = `lab12.pyg'.
 
 
 (./_minted-lab12/2CA2D4B872ED3B11C8EF2AEFECFCB432A117A4FD7AAF297DC0A517EAEBE16C
-9E.pygtex)
-<./plots/crossdock_all_pairs.png, id=161, 1084.05pt x 722.7pt>
+9E.pygtex) [10 <./intermediate/naltrexone/view.png>]
+<./plots/crossdock_all_pairs.png, id=169, 1084.05pt x 722.7pt>
 File: ./plots/crossdock_all_pairs.png Graphic file (type png)
 <use ./plots/crossdock_all_pairs.png>
-Package pdftex.def Info: ./plots/crossdock_all_pairs.png  used on input line 50
-0.
+Package pdftex.def Info: ./plots/crossdock_all_pairs.png  used on input line 48
+5.
 (pdftex.def)             Requested size: 450.43253pt x 300.28984pt.
- [9 <./intermediate/naltrexone/view.png>] [10 <./plots/crossdock_all_pairs.png>
-] (./lab12.aux)
+ [11 <./plots/crossdock_all_pairs.png>] [12] (./lab12.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -988,9 +987,9 @@ runsystem(rm lab12.pyg)...executed.
 
  ) 
 Here is how much of TeX's memory you used:
- 20914 strings out of 474222
- 400921 string characters out of 5748733
- 1945975 words of memory out of 5000000
+ 20916 strings out of 474222
+ 400935 string characters out of 5748733
+ 1938975 words of memory out of 5000000
  42779 multiletter control sequences out of 15000+600000
  576167 words of font info for 96 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1001,15 +1000,14 @@ r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share
 ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texmf/fonts/
 type1/public/cm-super/sfbx1200.pfb></usr/share/texmf/fonts/type1/public/cm-supe
 r/sfbx1440.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1728.pfb></usr
-/share/texmf/fonts/type1/public/cm-super/sfrm0800.pfb></usr/share/texmf/fonts/t
-ype1/public/cm-super/sfrm1200.pfb></usr/share/texmf/fonts/type1/public/cm-super
-/sfrm1440.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm2074.pfb></usr/
-share/texmf/fonts/type1/public/cm-super/sftt0800.pfb></usr/share/texmf/fonts/ty
-pe1/public/cm-super/sftt1200.pfb>
-Output written on lab12.pdf (10 pages, 1180252 bytes).
+/share/texmf/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texmf/fonts/t
+ype1/public/cm-super/sfrm1440.pfb></usr/share/texmf/fonts/type1/public/cm-super
+/sfrm2074.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt0800.pfb></usr/
+share/texmf/fonts/type1/public/cm-super/sftt1200.pfb>
+Output written on lab12.pdf (12 pages, 1170045 bytes).
 PDF statistics:
- 240 PDF objects out of 1000 (max. 8388607)
- 189 compressed objects within 2 object streams
- 35 named destinations out of 1000 (max. 500000)
+ 246 PDF objects out of 1000 (max. 8388607)
+ 195 compressed objects within 2 object streams
+ 37 named destinations out of 1000 (max. 500000)
  178 words of extra memory for PDF output out of 10000 (max. 10000000)
 

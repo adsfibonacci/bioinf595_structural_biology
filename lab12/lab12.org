@@ -1,6 +1,7 @@
 #+setupfile: ~/.emacs.d/latex.org
 #+title: Lab 12 Binder Design
 
+\newpage
 * Boltzgen
 First I created the DAMGO ~spec.yaml~ file since it didn't exist. I found the SMILES from Wikipedia, then ran the following code for each of ~DAMGO~, ~morphine~, ~naltrexone~, and ~nitazene~.
 
@@ -13,21 +14,18 @@ boltzgen run "intermediate/$RUN_ID/spec.yaml" \
   --reuse
 #+end_src
 
-
+\newpage
 * Inspection
-
 ** Overview of filtering behavior across all targets
 Across DAMGO, morphine, naltrexone, and nitazene, the pipeline is consistently dominated by structural RMSD-based filters:
 
-- filter_rmsd \leq 2.5 \,\text{\AA}
-- filter_rmsd_design \leq 2.5 \,\text{\AA}
-- designfolding-filter_rmsd \leq 2.5 \,\text{\AA}
+- filter rmsd \leq 2.5 \text{\AA}
+- filter rmsd design \leq 2.5 \text{\AA}
+- designfolding-filter rmsd \leq 2.5 \text{\AA}
 
 These are the primary gating constraints determining whether a design survives.
 
 Secondary sequence composition filters (ALA/GLY/GLU/LEU/VAL fractions) are weak and rarely binding across all targets.
-
----
 
 ** Yield and filtering efficiency
 
@@ -43,11 +41,9 @@ Key observation:
 - DAMGO and morphine are the most constrained.
 - Naltrexone is intermediate but still relatively permissive.
 
----
-
 ** Binding quality comparison
 
-Primary metric: design_to_target_iptm
+Primary metric: design to target iptm
 
 | Target       | Top-set mean |
 |--------------+-------------|
@@ -60,8 +56,6 @@ Interpretation:
 - Morphine and naltrexone remain the strongest overall binders.
 - Nitazene is comparable to naltrexone in predicted binding confidence.
 - DAMGO is consistently the weakest in binding geometry quality.
-
----
 
 ** Structural confidence (PAE)
 
@@ -77,8 +71,6 @@ Lower is better:
 Key observation:
 - Nitazene shows the lowest PAE overall, indicating the most confident structural predictions.
 - DAMGO remains the least confident among the four.
-
----
 
 ** Interaction profile differences
 
@@ -101,15 +93,11 @@ Hydrogen bonding and salt bridges:
 General trend:
 - Interaction richness does not always correlate with ipTM; nitazene improves structural confidence more than interaction density.
 
----
-
 ** Hydrophobic and burial signal
 
 - $\delta$ SASA is consistently strong across all targets (~400–500 range)
 - Nitazene and naltrexone show slightly higher mean burial in selected sets
 - DAMGO shows more variability and weaker clustering
-
----
 
 ** Diversity behavior (important systemic observation)
 
@@ -121,11 +109,9 @@ Across all four targets:
   - minimal sequence diversity in final 30 sets
 
 Consequences:
-- Strong clustering in num_design distributions
+- Strong clustering in num design distributions
 - Overlap between “top-quality” and “diverse” sets
 - Final sets are highly redundant structurally
-
----
 
 ** Overall comparison across targets
 
@@ -149,8 +135,6 @@ Difficulty ranking (hard → easy):
    - lowest PAE overall
    - strong structural convergence
 
----
-
 ** Key takeaways
 
 - RMSD-based structural filters dominate selection across all targets.
@@ -170,10 +154,11 @@ Across all ligands:
 
 RMSD-based structural filtering is the dominant constraint across all runs.
 
+\newpage
 * PyMOL
 Inside the PyMOL terminal, I did the following
 #+begin_src text
-  cd /home/alex/Documents/bioinf595_structural_biology/lab12/intermediate/$RUNID/merged/final_ranked_designs/final_30_designs/
+cd ~/lab12/intermediate/$RUNID/merged/final_ranked_designs/final_30_designs/
 #+end_src
 ** DAMGO
 #+begin_src text
@@ -336,10 +321,13 @@ Most of these had 3 or 4 \alpha helices, but there was an occasional \beta sheet
 BLASTP resutls show binding proteins could also be ubiquitin Mdm2 like or bromodomain containing binders.
 FoldSEEK agrees with the ubiquitin Mdm2 like interpretation. 
 
+\newpage
 * Cross Docking
 [[./plots/crossdock_all_pairs.png]]
 There is small clustering around the diagonal, but there are a lot of points away from the diagonal.
 This means binding affinity to one ligand does not reliably predict binding affinity to another. 
 
+\newpage
 * ESM Embeddings
 To test this, I would first compute ESM-2 embeddings for each designed protein sequence and project them into 2D using UMAP, then color points by their intended ligand to see if designs cluster by target. In parallel, I would generate structural interaction fingerprints for each receptor–ligand complex using PLIP, summarize interaction types into feature vectors, and similarly visualize or cluster them. By comparing these plots, I would assess whether designs group by ligand specificity, whether sequence similarity corresponds to similar binding interactions, and whether distinct clusters correspond to selective versus promiscuous binders.
+\newpage

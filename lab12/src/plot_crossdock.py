@@ -48,4 +48,4 @@ plt.tight_layout()
 os.makedirs("plots", exist_ok=True)
 plt.savefig("plots/crossdock_all_pairs.png", dpi=300)
 
-plt.show()
+plt.close()

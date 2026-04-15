@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1776263124.81791 "lab12.tex" "lab12.pdf" "lab12" 1776263125.81793 0
+["pdflatex"] 1776263902.05748 "lab12.tex" "lab12.pdf" "lab12" 1776263903.17553 0
   "/etc/texmf/web2c/texmf.cnf" 1775819683.36597 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm" 1136768653 3584 402da0b29eafbad07963b1224b222f18 ""
@@ -157,7 +157,6 @@
   "/usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb" 1776228898.11351 140176 d4962f948b4cc0adf4d3dde77a128c95 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb" 1776228898.11363 135942 859a90cad7494a1e79c94baf546d7de5 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfbx1728.pfb" 1776228898.11462 139826 9213617a7cb78635fc326b859c0b2273 ""
-  "/usr/share/texmf/fonts/type1/public/cm-super/sfrm0800.pfb" 1776228898.19063 164227 3df942b4ff2124425d8fb1b6d3e01c7a ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfrm1200.pfb" 1776228898.1925 136101 f533469f523533d38317ab5729d00c8a ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfrm1440.pfb" 1776228898.19263 131078 d96015a2fa5c350129e933ca070b2484 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfrm2074.pfb" 1776228898.19363 131290 ea265c7de37664eae04a6f91a1f7a51f ""
@@ -168,8 +167,8 @@
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1776229243 8213432 d3c90245d057d55a3746f5463f4c91c0 ""
   "_minted-lab12/0461D1DB205A0A4A614E98BFB4340539234E92AF2D7AB997AACAC645D33C2FE9.pygtex" 1776230482.39156 871 a1dd2a73c8cf467bc3b660e4378d0270 ""
   "_minted-lab12/2CA2D4B872ED3B11C8EF2AEFECFCB432A117A4FD7AAF297DC0A517EAEBE16C9E.pygtex" 1776263123.28573 3071 962f614747ae1751f46c4d91a5b0abb7 ""
-  "_minted-lab12/325C05A242E9A697E5704D5F9AFFA8D2A117A4FD7AAF297DC0A517EAEBE16C9E.pygtex" 1776263123.0236 234 35f300d0eefc1c04df06ec54017c7c2c ""
   "_minted-lab12/33200B291E246867427B8AF8E60985C6A117A4FD7AAF297DC0A517EAEBE16C9E.pygtex" 1776263123.2111 3069 55ee3956ccce3d73ecc27c4a768dcb90 ""
+  "_minted-lab12/625E8AC9283D4A4BA07868C71EB89D53A117A4FD7AAF297DC0A517EAEBE16C9E.pygtex" 1776263743.0632 233 25a229e6c626d82e1e511cdabda499b9 ""
   "_minted-lab12/AB0E8264577A9229CCB1532341CC24DBA117A4FD7AAF297DC0A517EAEBE16C9E.pygtex" 1776263123.11496 3069 f8cc57cbbfe200ed17cb9fe65fbddd63 ""
   "_minted-lab12/EA1897F5FBA79DCB4904045116C6CF99A117A4FD7AAF297DC0A517EAEBE16C9E.pygtex" 1776263123.06834 3070 db8928228f8de314f6b0cbfb0f00bd59 ""
   "_minted-lab12/emacs.pygstyle" 1776229293.35887 6428 9c4be8beac0d311135cc4ec9455b89aa ""
@@ -177,11 +176,11 @@
   "intermediate/DAMGO/outside-view.png" 1776237734.47447 117941 1f611924d31affffb0d3a2b27416847e ""
   "intermediate/morphine/view.png" 1776237734.47447 136174 a3486b0d600221f6dd66eb2145ab2377 ""
   "intermediate/naltrexone/view.png" 1776237734.47547 122645 64b4bad40dd9e2244a05b0ae0212e1f2 ""
-  "lab12.aux" 1776263125.75769 4474 b64e692166a0bca749a1858120e01b30 "pdflatex"
-  "lab12.out" 1776263125.75769 3020 3b2d050a3c46bcaf7f2c08bc1598b67f "pdflatex"
-  "lab12.tex" 1776263107.45335 20194 7fa55ebcda0608029df56cb75b50994a ""
-  "lab12.toc" 1776263125.76069 1588 9a4a133fba2976bb7ff71e0b5bc83883 "pdflatex"
-  "plots/crossdock_all_pairs.png" 1776262582.1496 701269 a778a688633e1a437fedd74eb6f2b174 ""
+  "lab12.aux" 1776263903.11515 4476 1c1825f84f857b01218f742b49d17c2d "pdflatex"
+  "lab12.out" 1776263903.11615 3020 3b2d050a3c46bcaf7f2c08bc1598b67f "pdflatex"
+  "lab12.tex" 1776263739.79546 20037 21f1b2412e2c6e14b004427276a2c65f ""
+  "lab12.toc" 1776263903.11915 1589 d0e5c7bfaa06239be7866e84b39ab31a "pdflatex"
+  "plots/crossdock_all_pairs.png" 1776263901.89014 720980 ad4af7c9b73852d4c9b0dbbbf424b2b4 ""
   (generated)
   "lab12.aux"
   "lab12.log"
