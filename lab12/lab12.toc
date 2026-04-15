@@ -17,3 +17,7 @@
 \contentsline {subsection}{\numberline {3.4}Nitazene}{10}{subsection.3.4}%
 \contentsline {section}{\numberline {4}Cross Docking}{11}{section.4}%
 \contentsline {section}{\numberline {5}ESM Embeddings}{12}{section.5}%
+\contentsline {section}{\numberline {6}Project Abstract}{13}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Knowledge Gap}{13}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Hypothesis}{13}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Data and Methods}{13}{subsection.6.3}%
