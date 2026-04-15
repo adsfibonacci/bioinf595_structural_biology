@@ -1,0 +1,46 @@
+_target_: boltzgen.task.predict.predict.Predict
+debug: false
+data:
+  _target_: boltzgen.task.predict.data_from_generated.FromGeneratedDataModule
+  cfg:
+    _target_: boltzgen.task.predict.data_from_generated.DataConfig
+    tokenizer:
+      _target_: boltzgen.data.tokenize.tokenizer.Tokenizer
+      atomize_modified_residues: false
+    featurizer:
+      _target_: boltzgen.data.feature.featurizer.Featurizer
+    suffix: .cif
+    suffix_metadata: .npz
+    suffix_native: _native.cif
+    samples_per_target: 1000000000000000
+    num_targets: 10000000000000
+    moldir: .cache/datasets--boltzgen--inference-data/snapshots/c3d36fd276e9caf098c75d4113c6d5eb320b1a4c/mols.zip
+    batch_size: 1
+    num_workers: 1
+    pin_memory: true
+  design_dir: intermediate/morphine/merged/task-outputs/intermediate_designs_inverse_folded
+  return_native: false
+  compute_affinity: true
+  target_templates: false
+  fail_if_no_designs: true
+  skip_existing: true
+  skip_existing_kind: affinity
+keys_dict_out: []
+writer:
+  _target_: boltzgen.task.predict.writer.AffinityWriter
+  design_dir: ${data.design_dir}
+trainer:
+  accelerator: gpu
+  logger: false
+  devices: 1
+  precision: bf16-mixed
+name: affinity_in_eval_affinity
+output: intermediate/morphine/merged/task-outputs/intermediate_designs_inverse_folded
+checkpoint: .cache/models--boltzgen--boltzgen-1/snapshots/c1be29e1f82ffcc72264f64b993c43fb4e0d17f0/boltz2_aff.ckpt
+matmul_precision: null
+recycling_steps: 3
+sampling_steps: 200
+diffusion_samples: 5
+override:
+  validators: null
+  use_kernels: true

@@ -25,3 +25,4 @@ lab8/wandb
 lab12/.cache/
 lab12/*.aux
 lab12/_minted-lab12/
+!lab12/intermediate
