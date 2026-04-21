@@ -17,9 +17,11 @@ Run
 #+end_src
 
 * Pipeline
-In the root directory
+Ensure bash scripts in ~src/~ are executable. 
 #+begin_src bash
-  python src/rcsb_collection.py
+  python -O src/rcsb_collection.py
   python src/reverse_transcribe.py
   sierralocal data/dataset_sequences_nt.fa -o data/dataset_resistance.json
+  bash src/remove_water.sh
 #+end_src
+The ~-O~ flag is to optimize the python script and not execute any ~__debug__~ statements. It will only download Retonavir pdb files otherwise. 
