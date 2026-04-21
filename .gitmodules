@@ -1,0 +1,3 @@
+[submodule "project/dependencies/sierra"]
+	path = project/dependencies/sierra
+	url = https://github.com/PoonLab/sierra-local

@@ -1,16 +1,21 @@
 anyio==4.13.0
 certifi==2026.2.25
 charset-normalizer==3.4.7
+Cython==3.2.4
 graphql-core==3.2.8
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
 idna==3.11
+more-itertools==11.0.2
 nest-asyncio==1.6.0
 numpy==2.4.4
+orjson==3.11.8
 rcsb-api==1.7.1
 requests==2.33.1
 rustworkx==0.17.1
+sierralocal @ file:///home/alex/Documents/bioinf595_structural_biology/project/dependencies/sierra
 tqdm==4.67.3
+types-setuptools==82.0.0.20260408
 typing_extensions==4.15.0
 urllib3==2.6.3

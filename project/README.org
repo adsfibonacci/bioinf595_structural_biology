@@ -1,0 +1,8 @@
+#+title: HIV-1 Protease Learning Models
+#+author: Alexander Speigle
+
+* Dependencies
+** RCSB
+This is installed via pip to access the Protein Databank. 
+** sierra-local
+~https://github.com/PoonLab/sierra-local~ is used to access the Stanford HIV database. It is added as a submodule, so the repo should be cloned with the ~recurse-submodules~ command. 
