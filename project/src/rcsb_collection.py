@@ -22,23 +22,27 @@ def extract_sequence_from_pdb(file_path):
             if line.startswith("ATOM") and line[12:16].strip() == "CA":
                 resn = line[17:20].strip()
                 resi = line[22:26].strip()
-
+                
                 key = (resi, resn)
                 if key in seen:
                     continue
-
+                
                 seen.add(key)
-
+                
                 if resn in AA_MAP:
                     seq.append(AA_MAP[resn])
-
+                    pass
+                pass
+            pass
+        pass        
+    
     return "".join(seq)
 
 
 # -----------------------------
 # MAIN PIPELINE
 # -----------------------------
-def fetch_hiv_protease_complexes(inhibitors, max_results_per_drug=10):
+def fetch_hiv_protease_complexes(inhibitors):
 
     base_dir = "data/pdb_files"
     fasta_path = "data/dataset_sequences.fa"
@@ -61,7 +65,7 @@ def fetch_hiv_protease_complexes(inhibitors, max_results_per_drug=10):
         drug_dir = os.path.join(base_dir, drug.lower())
         os.makedirs(drug_dir, exist_ok=True)
 
-        for pdb_id in results[:max_results_per_drug]:
+        for pdb_id in results:
             pdb_id_lower = pdb_id.lower()
 
             file_path = os.path.join(drug_dir, f"{pdb_id_lower}.pdb")
@@ -76,34 +80,30 @@ def fetch_hiv_protease_complexes(inhibitors, max_results_per_drug=10):
                 except Exception as e:
                     print(f"[{pdb_id}] download failed: {e}")
                     continue
-
-            # -----------------------------
-            # EXTRACT SEQUENCE
-            # -----------------------------
+                pass
+            
             seq = extract_sequence_from_pdb(file_path)
 
-            # -----------------------------
-            # FILTER BY LENGTH
-            # -----------------------------
             if not (70 <= len(seq) <= 120):
                 print(f"[{pdb_id}] Rejected (length {len(seq)}). Deleting file.")
                 os.remove(file_path)
                 continue
-
+            
             # keep sequence
             all_sequences[pdb_id] = seq
             print(f"[{pdb_id}] Accepted (length {len(seq)}).")
-
-    # -----------------------------
-    # WRITE FASTA
-    # -----------------------------
+            pass
+        pass
+    
     with open(fasta_path, "w") as f:
         for pdb_id, seq in all_sequences.items():
             f.write(f">{pdb_id}\n")
             f.write(seq + "\n")
+            pass
+        pass
 
     print(f"\nSaved {len(all_sequences)} sequences to {fasta_path}")
-
+    return
 
 # -----------------------------
 # RUN
@@ -124,7 +124,9 @@ if __name__ == "__main__":
 
     if __debug__:
         target_inhibitors = target_inhibitors[0:1]
+        pass
 
-    fetch_hiv_protease_complexes(target_inhibitors, max_results_per_drug=160)
+    fetch_hiv_protease_complexes(target_inhibitors)
 
     print("\nData collection complete.")
+    pass

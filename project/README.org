@@ -17,7 +17,8 @@ Run
 #+end_src
 
 * Pipeline
-Ensure bash scripts in ~src/~ are executable. 
+Ensure bash scripts in ~src/~ are executable.
+** Data Processing
 #+begin_src bash
   python -O src/rcsb_collection.py
   python src/reverse_transcribe.py
@@ -25,3 +26,5 @@ Ensure bash scripts in ~src/~ are executable.
   bash src/remove_water.sh
 #+end_src
 The ~-O~ flag is to optimize the python script and not execute any ~__debug__~ statements. It will only download Retonavir pdb files otherwise. 
+** Pyrosetta
+Mutations to the HIV-1 proteases are central to the core issue of HIV. To simulate robustness of a drug candidate, PyRosetta is used to simulate the environment in which rapid mutations occur. 

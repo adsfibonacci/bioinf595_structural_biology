@@ -36,19 +36,25 @@ def back_translate_smart(input_fasta, output_fasta):
                     else:
                         # Mutation found (or extra sequence), use standard fallback codon
                         dna_seq.append(FALLBACK_CODON_MAP.get(aa, 'NNN'))
-                        
+                        pass
+                    pass
+                
                 fout.write(f"{header}\n{''.join(dna_seq)}\n")
-
+                pass
+            return
+        
         for line in fin:
             line = line.strip()
             if not line: continue
-            
+                        
             if line.startswith(">"):
                 write_current_record()
                 header = line
                 seq_lines = []
             else:
                 seq_lines.append(line)
+                pass
+            pass
         
         write_current_record()
         
