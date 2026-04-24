@@ -1,4 +1,5 @@
 import os
+import glob
 import urllib.request
 from rcsbapi.search import TextQuery
 
@@ -38,13 +39,51 @@ def extract_sequence_from_pdb(file_path):
     
     return "".join(seq)
 
+# -----------------------------
+# PDB CLEANER (Apo-extractor)
+# -----------------------------
+def create_apo_structures(input_dir="data/pdb_ligand_files", output_dir="data/cleaned_pdb_files"):
+    """
+    Finds all PDBs in the input directory, strips out all ligands, 
+    waters, and their associated connectivity records, and saves the 
+    pure protein (apo) structures to the output directory.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Grab all .pdb files in subdirectories
+    pdb_files = glob.glob(os.path.join(input_dir, "**", "*.pdb"), recursive=True)
+    
+    if not pdb_files:
+        print(f"\nNo PDB files found in {input_dir} to clean.")
+        return
+
+    print(f"\n--- Cleaning {len(pdb_files)} PDB files (Removing ligands and water) ---")
+    
+    cleaned_count = 0
+    for file_path in pdb_files:
+        # Extract just the filename (e.g., "1hsg.pdb")
+        base_name = os.path.basename(file_path)
+        out_path = os.path.join(output_dir, base_name)
+        
+        with open(file_path, "r") as f_in, open(out_path, "w") as f_out:
+            for line in f_in:
+                # HETATM = Heteroatoms (ligands, waters, ions)
+                # CONECT = Bond connectivity (usually attached to HETATM records)
+                if line.startswith("HETATM") or line.startswith("CONECT"):
+                    continue 
+                f_out.write(line)
+                
+        cleaned_count += 1
+
+    print(f"Successfully cleaned {cleaned_count} structures. Saved to {output_dir}/")
+
 
 # -----------------------------
 # MAIN PIPELINE
 # -----------------------------
 def fetch_hiv_protease_complexes(inhibitors):
 
-    base_dir = "data/pdb_files"
+    base_dir = "data/pdb_ligand_files"
     fasta_path = "data/dataset_sequences.fa"
     os.makedirs(base_dir, exist_ok=True)
 
@@ -126,7 +165,11 @@ if __name__ == "__main__":
         target_inhibitors = target_inhibitors[0:1]
         pass
 
+    # 1. Download complexes and extract FASTA
     fetch_hiv_protease_complexes(target_inhibitors)
+    
+    # 2. Strip ligands and waters to create apo structures
+    create_apo_structures()
 
-    print("\nData collection complete.")
+    print("\nData collection and cleaning complete.")
     pass
