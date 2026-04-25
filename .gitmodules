@@ -4,3 +4,9 @@
 [submodule "project/dependencies/synformer"]
 	path = project/dependencies/synformer
 	url = git@github.com:adsfibonacci/synformer.git
+[submodule "project/dependencies/DiffDock"]
+	path = project/dependencies/DiffDock
+	url = git@github.com:gcorso/DiffDock.git
+[submodule "project/dependencies/EquiBind"]
+	path = project/dependencies/EquiBind
+	url = git@github.com:HannesStark/EquiBind.git
