@@ -1,15 +1,3 @@
-[submodule "project/dependencies/sierra"]
-	path = project/dependencies/sierra
-	url = https://github.com/PoonLab/sierra-local
 [submodule "project/dependencies/synformer"]
 	path = project/dependencies/synformer
 	url = git@github.com:adsfibonacci/synformer.git
-[submodule "project/dependencies/DiffDock"]
-	path = project/dependencies/DiffDock
-	url = git@github.com:gcorso/DiffDock.git
-[submodule "project/dependencies/EquiBind"]
-	path = project/dependencies/EquiBind
-	url = git@github.com:HannesStark/EquiBind.git
-[submodule "project/dependencies/Vina-GPU-2.1"]
-	path = project/dependencies/Vina-GPU-2.1
-	url = git@github.com:DeltaGroupNJUPT/Vina-GPU-2.1.git

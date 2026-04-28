@@ -11,7 +11,7 @@ import pandas as pd
 from datetime import datetime
 
 # Import 3D folding and mutation helpers
-from fragment_action import fold_3d, sanitize_smiles
+from src.fragment_action import fold_3d, sanitize_smiles
 
 # =========================================================
 # 1. SUBPROCESS WORKER (GPU ISOLATION)
@@ -276,6 +276,16 @@ def save_mcts_tree(root_node, filepath="intermediate/mcts_tree.pkl"):
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     with open(filepath, 'wb') as f:
         pickle.dump(root_node, f)
+
+def load_mcts_tree(filepath="intermediate/mcts_tree.pkl"):
+    """Loads a previously saved MCTS tree from a pickle file."""
+    try:
+        with open(filepath, 'rb') as f:
+            print(f"[*] Successfully loaded tree from {filepath}")
+            return pickle.load(f)
+    except (FileNotFoundError, EOFError, pickle.UnpicklingError):
+        print(f"[!] No valid checkpoint found at {filepath}. Starting fresh.")
+        return None
 
 def export_tree_to_csv(root_node, filename="results/mcts_final_production.csv"):
     os.makedirs(os.path.dirname(filename), exist_ok=True)
