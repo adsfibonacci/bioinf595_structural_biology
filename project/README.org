@@ -28,3 +28,8 @@ Ensure bash scripts in ~src/~ are executable.
 The ~-O~ flag is to optimize the python script and not execute any ~__debug__~ statements. It will only download Retonavir pdb files otherwise. 
 ** Pyrosetta
 Mutations to the HIV-1 proteases are central to the core issue of HIV. To simulate robustness of a drug candidate, PyRosetta is used to simulate the environment in which rapid mutations occur. 
+The command to run this is
+#+begin_src bash
+  python src/resistance_panel.py
+  python -O src/sanitize_resistance_panel.py
+#+end_src
