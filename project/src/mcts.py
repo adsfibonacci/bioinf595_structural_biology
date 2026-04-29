@@ -11,13 +11,14 @@ import pandas as pd
 from datetime import datetime
 
 # Import 3D folding and mutation helpers
-from src.fragment_action import fold_3d, sanitize_smiles
+from fragment_action import fold_3d, sanitize_smiles
 
 # =========================================================
 # 1. SUBPROCESS WORKER (GPU ISOLATION)
 # =========================================================
 
 def call_synformer_worker(smiles, K, L, model_path="dependencies/synformer/data/trained_weights/sf_ed_default.ckpt"):
+    print(os.getcwd())
     """
     Spawns a clean process to run Synformer. 
     Returns a jagged array (list of lists) of SMILES sequences.
@@ -254,11 +255,12 @@ class MCTS_Pipeline:
                 print("Backprop on leaf nodes")
                 self.backpropagate(leaf, leaf.vina_score or 0.0)
             else:
-                for t_node in terminal_nodes:
+                if len(terminal_nodes) > 0:
                     print(f"Backprop on {len(terminal_nodes)} terminal nodes")
+                for t_node in terminal_nodes:                    
                     self.backpropagate(t_node, reward)
                     
-            save_mcts_tree(root_node, f"intermediate/round_{i}.pkl")
+            save_mcts_tree(root_node, f"intermediate/round_{i+143}.pkl")
         return root_node
 
     def backpropagate(self, node, reward):

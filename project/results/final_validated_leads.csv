@@ -1,0 +1,11 @@
+SMILES,Val_Score
+C=C1CC[C@H](C(C)=C(CC(C)CC)c2cc(S(=O)(=O)N(C)c3cc(C(F)(F)F)ccc3N)ccc2F)CC1OC1(C(=O)Nc2ccc(F)c(S(=O)(=O)NC)c2)CC(OCC)=C1C,7.06
+Cc1c(F)c(F)c(NS(=O)(=O)c2ccc(C3(O)CCC(=O)C(=Cc4cc(Cl)cc(Cl)c4)C3)c(C)c2Cl)c(F)c1F,9.540000000000001
+Cc1c(C(F)(F)F)cc(C(F)(F)F)c(C)c1NS(=O)(=O)c1cccc(C=C2C(=O)CC3CC(C)CC23)c1,9.780000000000001
+Cc1cc(Cl)c(C2(O)CCC(=O)C(=Cc3cccc(O)c3)C2)cc1S(=O)(=O)Nc1c(O)c(Cl)cc(C)c1F,8.06
+NC1=CC(=O)C(=Cc2ccc(F)c(S(=O)(=O)Nc3cc(F)c(F)cc3NC3=CC(=O)CCC3)c2)CC1,8.84
+Cc1c(C2(O)CCC(=O)C(=Cc3cccc(Cl)c3)C2)ccc(S(=O)(=O)Nc2c(F)c(F)c(C)c(F)c2F)c1C,9.74
+CCOC1=C(C)C(O[C@H]2C[C@@H](C(C)=Cc3cc(S(=O)(=O)Nc4cc(C(F)(F)F)ccc4F)ccc3F)CC(C(C)CC)=C2C)(C(=O)Nc2cccc(S(=O)(=O)Nc3ccccc3F)c2)C1,6.92
+Cc1ccc(C=C2CC3(C)CC(=O)CC(C)(C2)C3)cc1S(=O)(=O)Nc1c(C)c(C(F)(F)F)cc(C(F)(F)F)c1C,9.52
+Cc1cc(C2(O)CCC(=O)C(=Cc3cccc(C=O)c3)C2)ccc1S(=O)(=O)Nc1c(F)c(F)c(C)c(F)c1F,8.620000000000001
+Cc1cccc(N(c2cc(C)c(F)cc2F)c2cccc(NC3=CC(=O)C(=Cc4ccc(F)c(F)c4)CC3)c2C)c1,9.58
